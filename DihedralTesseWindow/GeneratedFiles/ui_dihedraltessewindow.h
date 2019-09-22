@@ -30,6 +30,7 @@ class Ui_DihedralTesseWindowClass
 {
 public:
     QAction *actionLoadInput;
+	QAction *actionCompute;
     QAction *actionSaveMiddle;
     QAction *actionClear;
     QWidget *centralWidget;
@@ -59,6 +60,9 @@ public:
         QIcon icon;
         icon.addFile(QStringLiteral(":/icons/icons/fileNew.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionLoadInput->setIcon(icon);
+		actionCompute = new QAction(DihedralTesseWindowClass);
+		actionCompute->setObjectName(QStringLiteral("actionCompute"));
+		actionCompute->setIcon(icon);
         actionSaveMiddle = new QAction(DihedralTesseWindowClass);
         actionSaveMiddle->setObjectName(QStringLiteral("actionSaveMiddle"));
         QIcon icon1;
@@ -163,9 +167,11 @@ public:
 
         menuBar->addAction(menu->menuAction());
         menu->addAction(actionLoadInput);
+		menu->addAction(actionCompute);
         menu->addAction(actionSaveMiddle);
         menu->addAction(actionClear);
         mainToolBar->addAction(actionLoadInput);
+		mainToolBar->addAction(actionCompute);
         mainToolBar->addAction(actionSaveMiddle);
         mainToolBar->addAction(actionClear);
 
@@ -178,6 +184,7 @@ public:
     {
         DihedralTesseWindowClass->setWindowTitle(QApplication::translate("DihedralTesseWindowClass", "DihedralTesseWindow", 0));
         actionLoadInput->setText(QApplication::translate("DihedralTesseWindowClass", "Load Input", 0));
+		actionCompute->setText(QApplication::translate("DihedralTesseWindowClass", "Compute", 0));
         actionSaveMiddle->setText(QApplication::translate("DihedralTesseWindowClass", "Save Middle", 0));
         actionClear->setText(QApplication::translate("DihedralTesseWindowClass", "Clear", 0));
         menu->setTitle(QApplication::translate("DihedralTesseWindowClass", "File", 0));

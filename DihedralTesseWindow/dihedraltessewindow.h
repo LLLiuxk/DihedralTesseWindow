@@ -30,21 +30,25 @@ public:
 	~DihedralTesseWindow();
 
 private:
-	QGraphicsScene scene;
+	QGraphicsScene scene1;
 	QGraphicsScene scene2;
-	PolygonTile Polygon1;
+	QGraphicsScene scene3;
 	QPolygonF poly1;
 	QPolygonF poly2;
 	QPolygon poly3;
 	QGraphicsPolygonItem *Poly1;
 	QGraphicsPolygonItem *Poly2;
-	PolygonTile poly4;
+
 	QRect winRect[7];
 	QPoint lastPoint;
+
+	Tiling_opt *tiling_opt;
+
 
 
 public Q_SLOTS:
 	void on_actionLoadInput_triggered();
+	void on_actionCompute_triggered();
 	//void on_actionSaveMiddle_triggered();
 	void on_actionClear_triggered();
 
@@ -56,6 +60,7 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 	//void mouseMoveEvent(QMouseEvent *event);
 	void resizeEvent(QResizeEvent *event);
+	void moveEvent(QMoveEvent *event);
 	//bool eventFilter(QObject *o, QEvent *e);
 
 

@@ -35,6 +35,7 @@ DihedralTesseWindow::~DihedralTesseWindow()
 void
 DihedralTesseWindow::on_actionLoadInput_triggered()
 {
+	winRectupdate();
 	QString fileName = QFileDialog::getOpenFileName(this,
 		tr("Open Polygon File"),
 		"../contours/0.txt",
@@ -42,48 +43,78 @@ DihedralTesseWindow::on_actionLoadInput_triggered()
 	if (!fileName.isEmpty()){
 		openfile(fileName);
 	}
+	/*QPointF a(10, 10);
+	QPointF b(10, 200);
+	QPointF c(210, 200);
+	QPointF d(210, 10);
+	QVector<QPointF> tt;
+	tt.push_back(a);
+	tt.push_back(b);
+	tt.push_back(c);
+	tt.push_back(d);
+	QPolygonF ttt = QPolygonF(tt);
+	Poly1 = new QGraphicsPolygonItem(ttt);*/
+	//winRectupdate();
+
+	//show input
+	Poly1 = new QGraphicsPolygonItem(tiling_opt->poly_first->poly);
+	Poly1->setPen(QPen(Qt::blue, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+	Poly1->setBrush(QBrush(Qt::black));
+	scene1.addItem(Poly1);
+	scene1.setItemIndexMethod(QGraphicsScene::NoIndex);
+	scene1.setSceneRect(0, 0, 600, 600);
+	//scene1.setSceneRect(0, 0, 400, 400);
+	ui.graphicsView_2->setScene(&scene1);
+	//ui.graphicsView_2->setSceneRect(10, 10, 600, 600);
+	//ui.graphicsView_2->setSceneRect(Polygon1.poly_c.x - 300, Polygon1.poly_c.y - 300, 600, 600);
+	ui.graphicsView_2->scale(0.5, 0.5);
+	ui.graphicsView_2->show();
+
+	outt << winRect[0] << winRect[1] << winRect[2] << winRect[3];
 	//ui->setMouseTracking(true);
 	
 	//Poly2->polygon().swap(poly2);
-	Poly1 = new QGraphicsPolygonItem(Polygon1.poly);
-	Poly2 = new QGraphicsPolygonItem(Polygon1.poly);
-	//qDebug() << Poly2->polygon;
-	//Poly2->setScale(0.5);
-	Poly1->setPen(QPen(Qt::blue, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-	//Poly1->
-	Poly1->setBrush(QBrush(Qt::red));
-	Poly2->setBrush(QBrush(Qt::cyan));
+	
+	//Poly2 = new QGraphicsPolygonItem(Polygon1.poly);
+	////qDebug() << Poly2->polygon;
+	////Poly2->setScale(0.5);
+	//
+	//Poly2->setBrush(QBrush(Qt::cyan));
 
-	scene.addItem(Poly1);
-	scene.setItemIndexMethod(QGraphicsScene::NoIndex);
-	scene.setSceneRect(0, 0, 600, 600);
-	scene2.addItem(Poly2);
-	scene2.setItemIndexMethod(QGraphicsScene::NoIndex);
-	scene2.setSceneRect(0, 0, 600, 600);
-	ui.graphicsView_2->setScene(&scene);
-	ui.graphicsView_2->setSceneRect(Polygon1.poly_c.x - 300, Polygon1.poly_c.y - 300, 600, 600);
-	//ui.graphicsView_2->setSceneRect(poly1.boundingRect());
-	//outt << ui.graphicsView_2->sceneRect() << poly1.boundingRect();
-	//outt << "scale: " << ui.graphicsView_2->sceneRect();
-	ui.graphicsView_2->scale(0.5, 0.5);	
-	ui.graphicsView_2->show();
-	ui.graphicsView_3->setScene(&scene2);
-	//ui.graphicsView_3->setMouseTracking(true);
-	ui.graphicsView_3->show();
-	ui.graphicsView2->setScene(&scene2);
-	ui.graphicsView2->show();
-	ui.graphicsView->setScene(&scene2);
-	ui.graphicsView->show();
+
+
+	//scene2.addItem(Poly2);
+	//scene2.setItemIndexMethod(QGraphicsScene::NoIndex);
+	//scene2.setSceneRect(0, 0, 600, 600);
+	//
+	////ui.graphicsView_2->setSceneRect(poly1.boundingRect());
+	////outt << ui.graphicsView_2->sceneRect() << poly1.boundingRect();
+	////outt << "scale: " << ui.graphicsView_2->sceneRect();
+
+	//ui.graphicsView_3->setScene(&scene2);
+	////ui.graphicsView_3->setMouseTracking(true);
+	//ui.graphicsView_3->show();
+	//ui.graphicsView2->setScene(&scene2);
+	//ui.graphicsView2->show();
+	//ui.graphicsView->setScene(&scene2);
+	//ui.graphicsView->show();
 		
 }
 
-void 
+void
 DihedralTesseWindow::openfile(QString fileName)
 {
-	Polygon1 = PolygonTile(fileName.toStdString());
-	Polygon1.drawPolygon();
-	//outt << Polygon1.contour.size();
+	tiling_opt->initial(fileName.toStdString());
+	outt << "initial ok";
+
 }
+
+void 
+DihedralTesseWindow::on_actionCompute_triggered()
+{
+
+}
+
 
 void 
 DihedralTesseWindow::on_actionClear_triggered()
@@ -98,12 +129,11 @@ DihedralTesseWindow::on_actionClear_triggered()
 void 
 DihedralTesseWindow::wheelEvent(QWheelEvent *event)
 {
-	winRectupdate();
 	QPoint temp, temp1;
 	temp = event->globalPos();
 	temp1 = event->pos();
 	double s_factor = 0.25;
-	qDebug() << "QWheelEvent globalpos(): " << temp;
+	//qDebug() << "QWheelEvent globalpos(): " << temp;
 	
 	if (event->delta() > 0)
 	{
@@ -130,13 +160,21 @@ DihedralTesseWindow::mousePressEvent(QMouseEvent *event)
 	if (event->button() == Qt::LeftButton){
 
 		// 我们使用鼠标指针当前的位置减去差值，就得到了窗口应该移动的位置
-		QPointF temp,temp1,temp2;
+		QPointF temp, temp1, temp2, temp3,temp_view;
 		temp = event->globalPos();
 		
 		temp1 = event->screenPos();
 		temp2 = event->localPos();
-		lastPoint = temp.toPoint();
-		qDebug() << "QMouseEvent globalpos(): " << lastPoint;
+		temp3 = event->pos();
+		temp_view = temp - winRect[2].topLeft();
+		/*outt << "globalPos  " << temp;
+		outt << "screenPos  " << temp1;
+		outt << "localPos  " << temp2;
+		outt << "Pos  " << temp3;*/
+		temp_view = ui.graphicsView_2->mapToScene(temp_view.toPoint());
+		outt << "viewPos  " << temp_view;
+		//lastPoint = temp.toPoint();
+		//qDebug() << "QMouseEvent globalpos(): " << lastPoint;
 		
 		//Poly2->rotation();
 		//QRectF t = ui.graphicsView_2->sceneRect();
@@ -166,6 +204,12 @@ DihedralTesseWindow::resizeEvent(QResizeEvent *event)
 	
 }
 
+void 
+DihedralTesseWindow::moveEvent(QMoveEvent *event)
+{
+	winRectupdate();
+}
+
 
 void
 DihedralTesseWindow::winRectupdate()
@@ -183,7 +227,8 @@ DihedralTesseWindow::winRectupdate()
 void 
 DihedralTesseWindow::InitialData()
 {
-	outt << "hahah";
+	cout << "所有涉及坐标的计算使用的都是全局坐标"<<endl;
+	tiling_opt = new Tiling_tiles::Tiling_opt();
 }
 
 
