@@ -60,11 +60,11 @@ DihedralTesseWindow::on_actionLoadInput_triggered()
 	Poly1 = new QGraphicsPolygonItem(tiling_opt->poly_first->poly);
 	Poly1->setPen(QPen(Qt::blue, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 	Poly1->setBrush(QBrush(Qt::black));
-	scene1.addItem(Poly1);
-	scene1.setItemIndexMethod(QGraphicsScene::NoIndex);
-	scene1.setSceneRect(0, 0, 600, 600);
+	scene_2.addItem(Poly1);
+	scene_2.setItemIndexMethod(QGraphicsScene::NoIndex);
+	scene_2.setSceneRect(0, 0, 600, 600);
 	//scene1.setSceneRect(0, 0, 400, 400);
-	ui.graphicsView_2->setScene(&scene1);
+	ui.graphicsView_2->setScene(&scene_2);
 	//ui.graphicsView_2->setSceneRect(10, 10, 600, 600);
 	//ui.graphicsView_2->setSceneRect(Polygon1.poly_c.x - 300, Polygon1.poly_c.y - 300, 600, 600);
 	ui.graphicsView_2->scale(0.5, 0.5);
@@ -112,6 +112,61 @@ DihedralTesseWindow::openfile(QString fileName)
 void 
 DihedralTesseWindow::on_actionCompute_triggered()
 {
+	int result = tiling_opt->tiliing_generation();
+	QString message;
+	QMessageBox::StandardButton reply;
+	if (result == 0)
+	{
+		message = "Please input correct pattern at first!";
+		reply = QMessageBox::information(this, tr("Warning!"), message);
+	}
+	else if (result == 1)
+	{
+		message = "Computing over!";
+		reply = QMessageBox::information(this, tr("Information"), message);
+	}
+	else if (result == 2)
+	{
+		message = "The  file/dir had been Exisit!";
+		reply = QMessageBox::information(this, tr("Information"), message);
+	}
+	else if (result == 3)
+	{
+		message = "No right placement!";
+		reply = QMessageBox::information(this, tr("Information"), message);
+	}
+
+	if (result == 1)
+	{
+		cout << "Tiling num: "<<tiling_opt->all_tiling_Mat.size() << endl;
+		QString pixpath = "D:\\VisualStudioProjects\\DihedralTesseWindow\\result\\gv1\\show.png";
+		imwrite(pixpath.toStdString(), tiling_opt->all_tiling_Mat[0]);
+		QPixmap *pixmap = new QPixmap(pixpath);
+		scene.addPixmap(*pixmap);
+		scene.setSceneRect(0, 0, 800, 800);
+		//scene1.setSceneRect(0, 0, 400, 400);
+		ui.graphicsView->setScene(&scene);
+		//ui.graphicsView_2->setSceneRect(10, 10, 600, 600);
+		//ui.graphicsView_2->setSceneRect(Polygon1.poly_c.x - 300, Polygon1.poly_c.y - 300, 600, 600);
+		ui.graphicsView->show();
+
+		tiling_opt->poly_mid = new PolygonTile(tiling_opt->all_inner_conts[0].in_contour);
+		Poly2 = new QGraphicsPolygonItem(tiling_opt->poly_mid->poly);
+		Poly2->setPen(QPen(Qt::blue, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+		Poly2->setBrush(QBrush(Qt::black));
+		scene_3.addItem(Poly2);
+		scene_3.setItemIndexMethod(QGraphicsScene::NoIndex);
+		Point2f cen = tiling_opt->poly_mid->poly_c;
+		scene_3.setSceneRect(cen.x - 300, cen.y-300, 600, 600);
+		//scene1.setSceneRect(0, 0, 400, 400);
+		ui.graphicsView_3->setScene(&scene_3);
+		//ui.graphicsView_2->setSceneRect(10, 10, 600, 600);
+		//ui.graphicsView_2->setSceneRect(Polygon1.poly_c.x - 300, Polygon1.poly_c.y - 300, 600, 600);
+		ui.graphicsView_3->scale(0.5, 0.5);
+		ui.graphicsView_3->show();
+		
+	}
+	imshow("the 1 ", tiling_opt->all_tiling_Mat[0]);
 
 }
 

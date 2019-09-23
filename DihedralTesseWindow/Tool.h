@@ -55,8 +55,12 @@ namespace Tiling_tiles{
 
 	vector<int> feature_points(vector<Point2f> contour_, double dmin, double dmax, double angle_cos);
 
-	//bbx
-	QRectF b_box(vector<Point2f> contour);
+
+	//bounding box
+	void bbx_center_point(vector<vector<Point2f>> all_point, vector<Point2f> &five_p);
+	vector<Point2f> b_box(vector<Point2f> contour);//返回的点是从左上方逆时针
+	vector<Point2f> b_box_int(vector<Point> contour);//返回的点是从左上方逆时针
+	QRectF Q_bbox(vector<Point2f> contour);
 	
 	vector<Point2f> sampling(vector<Point2f> &contour_, int points_num);
 
@@ -76,7 +80,13 @@ namespace Tiling_tiles{
 	double cos_3edges(double l1, double l2, double l3);
 	double cos_two_vector(Point2f &v0, Point2f &v1);
 	double sin_two_vector(Point2f &v0, Point2f &v1);
+	double tar_2vector(Point2f &v0, Point2f &v1);
+	vector<double> curvature_com(const vector<Point2f> &contour_sam); //记录cos值
+	vector<double> recover_consin(const vector<double> &former);
+	vector<int> most_convex_p(vector<Point2f> contour_, vector<double> cont_c, int max_cur_num);
 
+	//sort
+	void sort_comb(vector<double> vect, vector<int> &index_num);
 	//void sort_bub(vector<int> &target);
 	template<typename T>
 	void sort_bub(vector<T> &target)  //从小到大

@@ -30,9 +30,13 @@ public:
 	~DihedralTesseWindow();
 
 private:
-	QGraphicsScene scene1;
+	QGraphicsScene scene;
 	QGraphicsScene scene2;
-	QGraphicsScene scene3;
+	QGraphicsScene scene_2;
+	QGraphicsScene scene_3;
+	QGraphicsScene scene_4;
+	QGraphicsScene scene_5;
+	QGraphicsScene scene_6;
 	QPolygonF poly1;
 	QPolygonF poly2;
 	QPolygon poly3;

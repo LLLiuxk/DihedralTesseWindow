@@ -835,7 +835,7 @@ namespace Tiling_tiles{
 				double angle1 = cos_3edges(length_l, length_r, length_op);
 				if (angle1 < angle_cos)  //角度大于angle_cos的度数
 				{
-					f == 1;
+					f = 1;
 					break;
 				}
 				else
@@ -884,12 +884,89 @@ namespace Tiling_tiles{
 			}
 			index_num.pop_back();
 		}
-		cout << index_num.size() << endl;
+		cout << "Feature Points num: "<< index_num.size() << endl;
 		return index_num;
 	}
 
+	void bbx_center_point(vector<vector<Point2f>> all_point, vector<Point2f> &five_p)
+	{
+		five_p.swap(vector<Point2f>());
+		vector<Point2f> contour;
+		for (int i = 0; i < all_point.size(); i++)
+		{
+			for (int j = 0; j < all_point[i].size(); j++)
+			{
+				contour.push_back(all_point[i][j]);
+			}
+		}
+		double bbx_max_x = -10000;
+		double bbx_max_y = -10000;
+		double bbx_min_x = 10000;
+		double bbx_min_y = 10000;
+		double center_x = 0;
+		double center_y = 0;
 
-	QRectF b_box(vector<Point2f> contour)
+		for (int i = 0; i < contour.size(); i++)
+		{
+			center_x += contour[i].x;
+			center_y += contour[i].y;
+			if (contour[i].x < bbx_min_x) bbx_min_x = contour[i].x;
+			if (contour[i].x > bbx_max_x) bbx_max_x = contour[i].x;
+			if (contour[i].y < bbx_min_y) bbx_min_y = contour[i].y;
+			if (contour[i].y > bbx_max_y) bbx_max_y = contour[i].y;
+		}
+		center_x = center_x / contour.size();
+		center_y = center_y / contour.size();
+		five_p.push_back(Point2f(center_x, center_y));
+		five_p.push_back(Point2f(bbx_min_x, bbx_max_y));
+		five_p.push_back(Point2f(bbx_min_x, bbx_min_y));
+		five_p.push_back(Point2f(bbx_max_x, bbx_min_y));
+		five_p.push_back(Point2f(bbx_max_x, bbx_max_y));
+
+	}
+
+	vector<Point2f> b_box(vector<Point2f> contour)
+	{
+		vector<Point2f> four_cor;
+		double bbx_max_x = -10000;
+		double bbx_max_y = -10000;
+		double bbx_min_x = 10000;
+		double bbx_min_y = 10000;
+		for (int i = 0; i < contour.size(); i++)
+		{
+			if (contour[i].x < bbx_min_x) bbx_min_x = contour[i].x;
+			if (contour[i].x > bbx_max_x) bbx_max_x = contour[i].x;
+			if (contour[i].y < bbx_min_y) bbx_min_y = contour[i].y;
+			if (contour[i].y > bbx_max_y) bbx_max_y = contour[i].y;
+		}
+		four_cor.push_back(Point2f(bbx_min_x, bbx_max_y));
+		four_cor.push_back(Point2f(bbx_min_x, bbx_min_y));
+		four_cor.push_back(Point2f(bbx_max_x, bbx_min_y));
+		four_cor.push_back(Point2f(bbx_max_x, bbx_max_y));
+		return four_cor;
+	}
+	vector<Point2f> b_box_int(vector<Point> contour)//返回的点是从左上方逆时针
+	{
+		vector<Point2f> four_cor;
+		double bbx_max_x = -10000;
+		double bbx_max_y = -10000;
+		double bbx_min_x = 10000;
+		double bbx_min_y = 10000;
+		for (int i = 0; i < contour.size(); i++)
+		{
+			if (contour[i].x < bbx_min_x) bbx_min_x = contour[i].x;
+			if (contour[i].x > bbx_max_x) bbx_max_x = contour[i].x;
+			if (contour[i].y < bbx_min_y) bbx_min_y = contour[i].y;
+			if (contour[i].y > bbx_max_y) bbx_max_y = contour[i].y;
+		}
+		four_cor.push_back(Point2f(bbx_min_x, bbx_max_y));
+		four_cor.push_back(Point2f(bbx_min_x, bbx_min_y));
+		four_cor.push_back(Point2f(bbx_max_x, bbx_min_y));
+		four_cor.push_back(Point2f(bbx_max_x, bbx_max_y));
+		return four_cor;
+	}
+
+	QRectF Qbbox(vector<Point2f> contour)
 	{
 		double bbx_max_x = -10000;
 		double bbx_max_y = -10000;
@@ -1140,6 +1217,107 @@ namespace Tiling_tiles{
 	double sin_two_vector(Point2f &v0, Point2f &v1)
 	{
 		return unit_vec(v0).x*unit_vec(v1).y - unit_vec(v0).y*unit_vec(v1).x;
+	}
+
+	double tar_2vector(Point2f &v0, Point2f &v1)
+	{
+		return v0.x*v1.y - v0.y*v1.x;
+	}
+
+	vector<double> curvature_com(const vector<Point2f> &contour_sam)
+	{
+		vector<double> eachOfcurvature;
+		int c_s = contour_sam.size();
+		//sin_two_vector>0 为一凸点,cos值+1.1; <0为一凹点,cos值-1.1
+		//使用1.1是为了防止在无限接近0时来回加减出现近似误差
+		//此处需要注意，opencv图像与正常坐标y轴相反
+		//提取轮廓点在图上看是逆时针，实际在正常坐标系为顺时针，因此应用顺时针来计算凹凸
+		for (int i = 0; i < c_s; i++)
+		{
+			double curvature = cos_two_vector(contour_sam[(i + c_s - 1) % c_s] - contour_sam[i], contour_sam[(i + 1) % c_s] - contour_sam[i]);
+			if (sin_two_vector(contour_sam[(i + c_s - 1) % c_s] - contour_sam[i], contour_sam[(i + 1) % c_s] - contour_sam[i]) > 0)
+				eachOfcurvature.push_back(curvature + 1.1);
+			else eachOfcurvature.push_back(curvature - 1.1);
+		}
+		return eachOfcurvature;
+	}
+
+	vector<double> recover_consin(const vector<double> &former)
+	{
+		vector<double> real_cos;
+		int size_f = former.size();
+		for (int i = 0; i < size_f; i++)
+		{
+			if (former[i] <= 0) real_cos.push_back(former[i] + 1.1);
+			else real_cos.push_back(former[i] - 1.1);
+		}
+		return real_cos;
+	}
+
+
+	vector<int> most_convex_p(vector<Point2f> contour_, vector<double> cont_c, int max_cur_num)
+	{
+		vector<int> index_num;
+		int contoursize = contour_.size();
+		for (int i = 0; i < contoursize; i++)
+		{
+			index_num.push_back(i);
+		}
+		vector<double> cont_c1 = recover_consin(cont_c);//确定是否加上凹点
+		//sort_comb(cont_c1, index_num);
+		sort_comb(cont_c1, index_num);
+		//for (int i = 0; i < 50; i++)
+		//	cout << cont_c[i] << endl;
+
+		vector<int> cand_points_index;
+		int t = 1;
+		cand_points_index.push_back(index_num[0]);
+		double length = contour_length(contour_);
+
+		for (int i = 1; i < contoursize; i++)
+		{
+			if (t >= max_cur_num) break;
+			else
+			{
+				int flag = 0;
+				for (vector<int>::iterator it = cand_points_index.begin(); it != cand_points_index.end(); it++)
+				{
+					double leng = length_two_point2f(contour_[index_num[i]], contour_[*it]);
+					if (leng < 0.008*length)
+					{
+						flag = 1;
+						break;
+					}
+				}
+
+				if (flag == 0)
+				{
+					cand_points_index.push_back(index_num[i]);
+					t++;
+				}
+			}
+		}
+		if (cand_points_index.size()<max_cur_num)
+			cout << "cand_points_index: " << cand_points_index.size() << "  <max_cur_num" << endl;
+		return cand_points_index;
+	}
+
+	void sort_comb(vector<double> vect, vector<int> &index_num) //将下标和数值联合排序，只保留下标的排序,从大到小
+	{
+		int i, j;
+		double temp;
+		int num;
+		for (i = 0; i < vect.size() - 1; i++)
+			for (j = 0; j < vect.size() - 1 - i; j++)
+				if (vect[j] < vect[j + 1])
+				{
+					temp = vect[j];
+					vect[j] = vect[j + 1];
+					vect[j + 1] = temp;
+					num = index_num[j];
+					index_num[j] = index_num[j + 1];
+					index_num[j + 1] = num;
+				}
 	}
 
 	void fileout(string filepath, vector<Point> contour_)

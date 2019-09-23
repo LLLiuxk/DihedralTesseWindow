@@ -32,6 +32,14 @@ namespace Tiling_tiles{
 		poly_c = center_p(contour);
 	}
 
+	PolygonTile::PolygonTile(const vector<Point2f> &v)
+	{
+		contour = v;
+		Qcontour = vecp_cv2qt(contour);
+		poly = QPolygonF(Qcontour);
+		poly_c = center_p(contour);
+	}
+
 	PolygonTile::PolygonTile(const QVector<QPointF> &v)
 	{
 		poly = QPolygonF(v);
@@ -162,8 +170,7 @@ namespace Tiling_tiles{
 		ifstream in(filename);
 		if (!in.is_open())
 		{
-			cout << filename << endl;
-			cout << "Error opening file" << endl;
+			cout << "Error opening file: "<< filename << endl;
 			return con_point;
 		}
 		//挨个处理每个字符
@@ -228,6 +235,7 @@ namespace Tiling_tiles{
 			string filepath = "D:\\VisualStudioProjects\\DihedralTessellation\\contours\\" + filename + ".txt";
 			contour = readTxt(filepath);
 		}
+		if (contour.empty()) return;
 		Qcontour = vecp_cv2qt(contour);
 		poly = QPolygonF(Qcontour);
 		poly_c = center_p(contour);
@@ -287,11 +295,6 @@ namespace Tiling_tiles{
 		int margin = 12;      //margin个点的采样间隔
 		double ratio = 0.012; //筛选间隔与周长之比
 		vector<int> max_order;
-		if (contour.empty())
-		{
-			cout << "contour is empty!";
-			exit(0);
-		}
 		contour_sampling();
 		max_order = cand_tiling_v(cur_p_num);
 		int contoursize = contour.size();
@@ -315,7 +318,7 @@ namespace Tiling_tiles{
 				all_order.push_back(i);
 			}
 		}
-		cout << "all_order.size:" << all_order.size() << endl;
+		cout << "Candidate tiling vertices num: " << all_order.size() << endl;
 		sort_bub(all_order);
 
 		// show convex points
@@ -375,6 +378,46 @@ namespace Tiling_tiles{
 			}
 		}
 		return cont_s;
+	}
+
+	vector<vector<double>> PolygonTile::compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac)
+	{
+		vector<vector<double>> all_tar;
+		int consize = contour_.size();
+		int tar_num = frac * consize - 1;
+		shape_complexity = 0;
+		//cout << "consize: " << consize << " tar_num: " << tar_num << endl;
+		vector<double> maxtar(tar_num, 0);// 记录最大值来进行归一化
+		for (int i = 0; i < consize; i++)
+		{
+			vector<double> one_p_tar;
+			for (int j = 0; j < tar_num; j++)
+			{
+				Point2f vpsubts_vp = contour_[(i - j - 1 + consize) % consize] - contour_[i];
+				Point2f vpplusts_vp = contour_[(i + j + 1) % consize] - contour_[i];
+				double tar = 0.5 * tar_2vector(vpplusts_vp, vpsubts_vp);
+				//cout << vpsubts_vp << "  " << vpplusts_vp << endl;
+				one_p_tar.push_back(tar);
+				if (abs(tar) > maxtar[j]) maxtar[j] = abs(tar);
+
+			}
+			all_tar.push_back(one_p_tar);
+		}
+		for (int i = 0; i < consize; i++)
+		{
+			double max_tar_one = 0;
+			double min_tar_one = 10000;
+			for (int j = 0; j < tar_num; j++)
+			{
+				all_tar[i][j] = all_tar[i][j] / maxtar[j];
+				if (all_tar[i][j] > max_tar_one) max_tar_one = all_tar[i][j];
+				if (all_tar[i][j] < min_tar_one) min_tar_one = all_tar[i][j];
+			}
+			shape_complexity += abs(max_tar_one - min_tar_one);
+		}
+		shape_complexity = shape_complexity / consize;
+		//cout << all_tar[0].size() << "    shape_com: " << shape_complexity << endl;
+		return all_tar;
 	}
 
 	//vector<vector<double>> PolygonTile::compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac)

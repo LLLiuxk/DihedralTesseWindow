@@ -131,6 +131,7 @@
      <string>File</string>
     </property>
     <addaction name="actionLoadInput"/>
+    <addaction name="actionCompute"/>
     <addaction name="actionSaveMiddle"/>
     <addaction name="actionClear"/>
    </widget>
@@ -144,6 +145,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionLoadInput"/>
+   <addaction name="actionCompute"/>
    <addaction name="actionSaveMiddle"/>
    <addaction name="actionClear"/>
   </widget>
@@ -156,6 +158,16 @@
    <property name="text">
     <string>Load Input</string>
    </property>
+  </action>
+  <action name="actionCompute">
+    <property name="icon">
+      <iconset resource="dihedraltessewindow.qrc">
+        <normaloff>:/icons/icons/fileNew.png</normaloff>:/icons/icons/fileNew.png
+      </iconset>
+    </property>
+    <property name="text">
+      <string>Compute Tiling</string>
+    </property>
   </action>
   <action name="actionSaveMiddle">
    <property name="icon">

@@ -23,10 +23,18 @@ using namespace std;
 
 namespace Tiling_tiles{
 
+	typedef struct innerPat_pare
+	{
+		int type; //0:trans,1:rota,2:flip(13),3:flip(24)
+		vector<int> in_interval;
+		vector<Point2f> in_contour;
+	}inPat;
+
 	class PolygonTile{
 	public:
 		PolygonTile();
 		PolygonTile(string filename);
+		PolygonTile(const vector<Point2f> &v);
 		PolygonTile(const QVector<QPointF> &v);
 		void poly_clear();
 
@@ -47,6 +55,9 @@ namespace Tiling_tiles{
 
 		//flipping
 		vector<Point2f> flip_contour(vector<Point2f> cont_s, int flag = 0);//0Ë®Æ½·­×ª
+
+		//compute TAR
+		vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac = 0.25);
 
 		//draw polygon
 		void drawPolygon();
@@ -94,9 +105,30 @@ namespace Tiling_tiles{
 		void initial(string file);
 		//load dataset
 		void load_dataset();
-		void tiliing_generation();
+		int tiliing_generation(); //1 successd 0 failed
 
 		void com_all_TARs(int num_c);
+
+		//tiling rules
+		int Rotation_rule(vector<int> part_points_index, vector<Point2f> &contour_s, string rootname);
+		int Tanslation_rule(vector<int> part_points_index, vector<Point2f> &contour_s, string rootname);
+		int Flipping_rule(vector<int> part_points_index, vector<Point2f> &contour_s, string rootname);
+
+		//rotation
+		bool rotation_placement(vector<int> results, vector<Point2f> &contour_s, vector<Point2f> &return_B, vector<int> &return_p, Mat &countname);
+		vector<vector<int>> find_rota_tilingV(vector<Point2f> cont, vector<int> mark_13);
+
+		//translation
+		bool translation_placement(vector<int> results, vector<Point2f> &contour_s, vector<Point2f> &return_B, vector<int> &return_p, Mat &countname);
+
+		//flipping
+		bool flipping_placement(vector<int> results, vector<Point2f> &contour_s, vector<Point2f> &return_B, vector<int> &return_p, Mat &countname, int type);
+
+		vector<Point2f> extract_contour(vector<Point2f> contour_, vector<int> mark_p, vector<int> &midmark_p, vector<vector<Point2f>> &four_place, int type);
+
+		//collision		
+		bool coll_detec_bbx(vector<Point2f> contour1, vector<Point2f> contour2, int threshold);
+		bool vertex_angle(vector<Point2f> angle1, vector<Point2f> angle2);
 
 	public:
 		PolygonTile *poly_first;
@@ -110,6 +142,10 @@ namespace Tiling_tiles{
 		vector<vector<vector<double>>> all_con_tars_flip;
 		vector<vector<vector<double>>> all_fea_tars;
 		vector<vector<vector<double>>> all_fea_tars_flip;
+		vector<double> all_shape_complexity;
+		vector<inPat> all_inner_conts;
+		vector<Mat> all_tiling_Mat;
+
 
 	};
 }
