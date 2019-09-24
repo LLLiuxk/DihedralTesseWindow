@@ -211,7 +211,7 @@ DihedralTesseWindow::on_actionMorphing_triggered()
 	Poly4->setBrush(QBrush(Qt::black));
 	scene_5.addItem(Poly4);
 	scene_5.setItemIndexMethod(QGraphicsScene::NoIndex);
-	Point2f cen = tiling_opt->poly_second->poly_c;
+	Point2f cen = tiling_opt->poly_tem->poly_c;
 	scene_5.setSceneRect(cen.x - 300, cen.y - 300, 600, 600);
 	//scene1.setSceneRect(0, 0, 400, 400);
 	ui.graphicsView_5->setScene(&scene_5);
@@ -224,9 +224,10 @@ DihedralTesseWindow::on_actionMorphing_triggered()
 	QString pixpath1 = "D:\\VisualStudioProjects\\DihedralTesseWindow\\result\\gv2\\tiling_result.png";
 	QString pixpath2 = "D:\\VisualStudioProjects\\DihedralTesseWindow\\result\\gv2\\morphedA.png";
 	Mat drawing_result = Mat(2000, 2000, CV_8UC3, Scalar(0, 0, 0));
-	Mat drawing_mA = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
+	Mat drawing_mA = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
 	draw_allplane(drawing_result, tiling_opt->poly_tem->contour_sample[1], mid_inter_new, 0.4, tiling_opt->all_inner_conts[tiling_opt->Tiling_index].type);
-	draw_poly(drawing_mA, morphed_A, center_p(morphed_A),0);
+	cout << "morphed_A num: " << morphed_A.size() << endl;
+	draw_poly(drawing_mA, morphed_A, Point2f(300,300), 0);
 	imwrite(pixpath1.toStdString(), drawing_result);
 	imwrite(pixpath2.toStdString(), drawing_mA);
 
@@ -236,11 +237,12 @@ DihedralTesseWindow::on_actionMorphing_triggered()
 	scene2.setSceneRect(0, 0, 1600, 1600);
 	//scene1.setSceneRect(0, 0, 400, 400);
 	ui.graphicsView2->setScene(&scene2);
-	ui.graphicsView2->fitInView(scene2.sceneRect(), Qt::KeepAspectRatio);
+	ui.graphicsView2->scale(0.75, 0.75);
+	//ui.graphicsView2->fitInView(scene2.sceneRect(), Qt::KeepAspectRatio);
 	ui.graphicsView2->show();
 
 	scene_6.addPixmap(*pixmap2);
-	scene_6.setSceneRect(0, 0, 1600, 1600);
+	scene_6.setSceneRect(0, 0, 800, 800);
 	//scene1.setSceneRect(0, 0, 400, 400);
 	ui.graphicsView_6->setScene(&scene_6);
 	ui.graphicsView_6->fitInView(scene_6.sceneRect(), Qt::KeepAspectRatio);

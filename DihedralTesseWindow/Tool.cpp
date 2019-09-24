@@ -73,7 +73,7 @@ namespace Tiling_tiles{
 	void draw_poly(Mat &drawing_, vector<Point2f> contour_s, Point2f center, int color)
 	{
 		Scalar col_sca = Scalar(0, 0, 0);
-		if (color < colorbar.size())
+		if (color < colorbar.size() && color>0)
 			col_sca = colorbar[color].second;
 		Point2f shift = center - center_p(contour_s);
 		int n = contour_s.size();
@@ -98,6 +98,7 @@ namespace Tiling_tiles{
 
 	void draw_allplane(Mat &drawing_, vector<Point2f> contour_, vector<int> vec_, double scale, int type)
 	{
+		int color = 1;//white
 		int drawrow = drawing_.rows;
 		int drawcol = drawing_.cols;
 		int border = -300 * scale;
@@ -124,7 +125,7 @@ namespace Tiling_tiles{
 			step[3] = -step[1];
 
 			Point2f cenp = Point2f(drawrow / 2, drawcol / 2);
-			draw_poly(drawing_, contour_, cenp);
+			draw_poly(drawing_, contour_, cenp, color);
 			cent_stack.push(cenp);
 			while (!cent_stack.empty())
 			{
@@ -151,7 +152,7 @@ namespace Tiling_tiles{
 						{
 							cent_stack.push(cenp);
 							allcent_in_plane.push_back(cenp);
-							draw_poly(drawing_, contour_, cenp);
+							draw_poly(drawing_, contour_, cenp,color);
 						}
 					}
 				}
@@ -176,8 +177,8 @@ namespace Tiling_tiles{
 
 			Point2f cenp = Point2f(drawrow / 2, drawcol / 2);
 			Point2f cenp_r = cenp + shift;
-			draw_poly(drawing_, contour_, cenp);
-			draw_poly(drawing_, contour_r, cenp_r);
+			draw_poly(drawing_, contour_, cenp, color);
+			draw_poly(drawing_, contour_r, cenp_r, color);
 			cent_stack.push(cenp);
 			cent_stack_r.push(cenp_r);
 			while (!cent_stack.empty())
@@ -203,7 +204,7 @@ namespace Tiling_tiles{
 						{
 							cent_stack.push(cenp);
 							allcent_in_plane.push_back(cenp);
-							draw_poly(drawing_, contour_, cenp);
+							draw_poly(drawing_, contour_, cenp,color);
 						}
 					}
 				}
@@ -231,7 +232,7 @@ namespace Tiling_tiles{
 						{
 							cent_stack_r.push(cenp_r);
 							allcent_in_plane_.push_back(cenp_r);
-							draw_poly(drawing_, contour_r, cenp_r);
+							draw_poly(drawing_, contour_r, cenp_r,color);
 						}
 					}
 				}
@@ -277,8 +278,8 @@ namespace Tiling_tiles{
 
 			Point2f cenp = Point2f(drawrow / 2, drawcol / 2);
 			Point2f cenp_r = cenp + shift;
-			draw_poly(drawing_, contour_, cenp);
-			draw_poly(drawing_, contour_r, cenp_r);
+			draw_poly(drawing_, contour_, cenp,color);
+			draw_poly(drawing_, contour_r, cenp_r,color);
 			cent_stack.push(cenp);
 			cent_stack_r.push(cenp_r);
 			while (!cent_stack.empty())
@@ -304,7 +305,7 @@ namespace Tiling_tiles{
 						{
 							cent_stack.push(cenp);
 							allcent_in_plane.push_back(cenp);
-							draw_poly(drawing_, contour_, cenp);
+							draw_poly(drawing_, contour_, cenp,color);
 						}
 					}
 				}
@@ -332,7 +333,7 @@ namespace Tiling_tiles{
 						{
 							cent_stack_r.push(cenp_r);
 							allcent_in_plane_.push_back(cenp_r);
-							draw_poly(drawing_, contour_r, cenp_r);
+							draw_poly(drawing_, contour_r, cenp_r,color);
 						}
 					}
 				}
@@ -377,8 +378,8 @@ namespace Tiling_tiles{
 
 			Point2f cenp = Point2f(drawrow / 2, drawcol / 2);
 			Point2f cenp_r = cenp + shift;
-			draw_poly(drawing_, contour_, cenp);
-			draw_poly(drawing_, contour_r, cenp_r);
+			draw_poly(drawing_, contour_, cenp,color);
+			draw_poly(drawing_, contour_r, cenp_r,color);
 			cent_stack.push(cenp);
 			cent_stack_r.push(cenp_r);
 			while (!cent_stack.empty())
@@ -404,7 +405,7 @@ namespace Tiling_tiles{
 						{
 							cent_stack.push(cenp);
 							allcent_in_plane.push_back(cenp);
-							draw_poly(drawing_, contour_, cenp);
+							draw_poly(drawing_, contour_, cenp,color);
 						}
 					}
 				}
@@ -432,7 +433,7 @@ namespace Tiling_tiles{
 						{
 							cent_stack_r.push(cenp_r);
 							allcent_in_plane_.push_back(cenp_r);
-							draw_poly(drawing_, contour_r, cenp_r);
+							draw_poly(drawing_, contour_r, cenp_r,color);
 						}
 					}
 				}
