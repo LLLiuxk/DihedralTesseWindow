@@ -9,6 +9,8 @@ namespace Tiling_tiles{
 		poly_second = new PolygonTile();
 		poly_tem = new PolygonTile();
 		all_types = 500;
+		Tiling_index = 0;
+		Candidate_index = 0;
 		//memset(dp, 0, sizeof(dp));
 		//memset(dp_inver, 0, sizeof(dp_inver));
 
@@ -83,8 +85,8 @@ namespace Tiling_tiles{
 		}
 		//mkdir(na);
 
-		int trans = Tanslation_rule(p_p_index, contour_, rootname);
-		int rotas = Rotation_rule(p_p_index, contour_, rootname);
+		int trans = 0; //Tanslation_rule(p_p_index, contour_, rootname);
+		int rotas = 0;// Rotation_rule(p_p_index, contour_, rootname);
 		int flips = Flipping_rule(p_p_index, contour_, rootname);
 		int count = trans + rotas + flips;
 		cout << "succeed count: " << count << " trans: " << trans << " rotat: " << rotas << " flips: " << flips << endl;
@@ -973,6 +975,490 @@ namespace Tiling_tiles{
 		imshow("extracted contour",drawing_ttt);*/
 
 		return morphed_B;
+	}
+
+	void Tiling_opt::match_candidate()
+	{
+		if (all_inner_conts.empty())
+		{
+			cout << "No correct middle patterns!" << endl;
+			return;
+		}
+		int num_c = 1;//采样点数
+		vector<pair<int, bool>> candidate_patterns;
+		candidate_patterns = compare_choose_TAR(all_inner_conts[Tiling_index].in_contour);
+		
+		mid_inter = joint_relocate(all_inner_conts[Tiling_index].in_contour, all_inner_conts[Tiling_index].in_interval, num_c);
+
+		vector<Point2f> contour_inner = poly_mid->contour_sample[1];
+		double sc_inner = 0;
+		vector<vector<double>> inner_tar = poly_mid->compute_TAR(contour_inner, sc_inner);
+		candidate_contours.swap(vector<vector<Point2f>>());
+		cand_paths.swap(vector<vector<pair<int, int>>>());
+
+		for (int j = 0; j < 8; j++) //只要候选图案里的前8个
+		{
+			//将所有的结果保存下来
+			poly_second->loadPoints(contour_dataset[candidate_patterns[j].first]);
+			poly_second->contour_sampling();
+
+			vector<Point2f> contour_cand;// = prototile_second->contour_sample[1];
+			vector<vector<double>> cand_tar;
+			if (candidate_patterns[j].second)
+			{
+				//cout << "it is flip" << endl;
+				cand_tar = all_con_tars_flip[candidate_patterns[j].first];
+				contour_cand = poly_second->contour_sample_flip[1];
+			}
+			else
+			{
+				//cout << "it is not flip" << endl;
+				cand_tar = all_con_tars[candidate_patterns[j].first];
+				contour_cand = poly_second->contour_sample[1];
+			}
+			vector<pair<int, int>> path;
+			int shift = 0;
+			int width = 6;
+			double re = tar_mismatch(inner_tar, cand_tar, path, shift, width);
+			
+			vector<Point2f> contour_mid;
+			int c2size = contour_cand.size();
+			for (int i = shift; i < shift + c2size; i++)
+			{
+				contour_mid.push_back(contour_cand[i % c2size]);
+			}
+
+			cout << contour_inner.size() << "   " << c2size << "  c3: " << contour_mid.size() << endl;
+			contour_cand = contour_mid;
+			double scale = arcLength(contour_inner, true) / arcLength(contour_cand, true);
+			//cout << "scale: " << scale << endl;
+			for (int i = 0; i < contour_cand.size(); i++)
+			{
+				contour_cand[i] = contour_cand[i] * scale;
+			}
+			Point2f cen1 = center_p(contour_inner);
+			Point2f cen2 = center_p(contour_cand);
+			Point2f shift2 = cen1 - cen2;
+			for (int i = 0; i < contour_cand.size(); i++)
+			{
+				contour_cand[i] = contour_cand[i] + shift2;
+			}
+			Point2f v0 = contour_inner[0] - cen1;
+			Point2f v1 = contour_cand[0] - cen1;
+			double angle = acos(cos_two_vector(v0, v1)) / PI * 180;
+			if (sin_two_vector(v0, v1) < 0) angle = -angle;
+			Mat rot_mat(2, 3, CV_32FC1);
+			rot_mat = getRotationMatrix2D(cen1, angle, 1);
+			transform(contour_cand, contour_mid, rot_mat);
+			contour_cand = contour_mid;
+
+			candidate_contours.push_back(contour_cand);
+			cand_paths.push_back(path);
+
+		}
+	
+	}
+
+	vector<pair<int, bool>> Tiling_opt::compare_choose_TAR(vector<Point2f> inner_c)
+	{
+		int method = 1;
+		int match_width = 4;
+		vector<pair<int, bool>> all_total;
+
+		cout << "poly_mid points: " << poly_mid->contour.size() << endl;
+		poly_mid->loadPoints(inner_c);
+		poly_mid->contour_sampling();
+
+		if (method == 1) all_total = quick_choose_TAR(poly_mid->contour_sample[1]);
+		else if (method == 2)
+		{
+			for (int i = 0; i < all_types; i++)
+				all_total.push_back(make_pair(i, true));
+		}
+		int total_num = all_total.size();
+		vector<pair<int, bool>> all_final;
+		vector<double> all_result;	
+
+		vector<Point2f> contour_mid = poly_mid->contour_sample[1];
+
+		double shape_com_mid;
+		vector<vector<double>> tar_mid = poly_mid->compute_TAR(contour_mid, shape_com_mid);
+		//cout << "contour_mid: " << contour_mid.size() << "  tar_mid: " << tar_mid.size() << endl;
+		for (int can_num = 0; can_num < total_num; can_num++)
+		{
+			int index = all_total[can_num].first;
+			//cout << index << "  : ";
+			vector<vector<double>> tar_sec = all_con_tars[index];
+			vector<vector<double>> tar_sec_f = all_con_tars_flip[index];
+			vector<pair<int, int>> path;
+			int shift = 0;
+			double re = tar_mismatch(tar_mid, tar_sec, path, shift, match_width);
+			double re2 = tar_mismatch(tar_mid, tar_sec_f, path, shift, match_width);
+			re = re / (1 + shape_com_mid + all_shape_complexity[index]);
+			re2 = re2 / (1 + shape_com_mid + all_shape_complexity[index]);
+
+			if (re < re2)
+			{
+				all_result.push_back(re);
+				all_final.push_back(make_pair(index, false));
+				//cout << re << endl;
+			}
+			else
+			{
+				all_result.push_back(re2);
+				all_final.push_back(make_pair(index, true));
+				//cout << re2 << endl;
+			}
+		}
+		double temp;
+		pair<int, bool> tempp;
+		int all_size = all_result.size();
+		for (int i = 0; i < all_size - 1; i++)
+			for (int j = 0; j < all_size - 1 - i; j++)
+				if (all_result[j] < all_result[j + 1])
+				{
+					temp = all_result[j];
+					all_result[j] = all_result[j + 1];
+					all_result[j + 1] = temp;
+					tempp = all_final[j];
+					all_final[j] = all_final[j + 1];
+					all_final[j + 1] = tempp;
+				}
+		//cout << "the fianl order: " << endl;
+		vector<pair<int, bool>> all_total_mid;
+		for (int t = total_num - 1; t > total_num - 150; t--)
+		{
+			all_total_mid.push_back(all_final[t]);
+			cout << "order: " << all_final[t].first << "  flip: " << all_final[t].second << " value: " << all_result[t] << " complxeity: " << all_shape_complexity[all_final[t].first] << endl;
+		}
+		all_final.swap(all_total_mid);
+
+		return all_final;
+	}
+
+	vector<pair<int, bool>> Tiling_opt::quick_choose_TAR(vector<Point2f> contour_mid) //得到选择出的pattern的序号和是否翻转的标志
+	{
+		int match_width = 4;
+		vector<pair<int, bool>> all_total; //未翻转:false,翻转:true
+		vector<double> all_result;
+		int total_num = contour_dataset.size();
+
+		double shape_com_mid;
+		vector<vector<double>> tar_mid = poly_mid->compute_TAR(contour_mid, shape_com_mid);
+		vector<int> cand_points_index = most_convex_p(contour_mid, curvature_com(contour_mid), 30);
+		//cout << "feature :" << cand_points_index.size()  << "total_num:  " << total_num<<endl;
+		vector<vector<double>> tar_fea;
+		for (int j = 0; j < cand_points_index.size(); j++)
+		{
+			tar_fea.push_back(tar_mid[cand_points_index[j]]);
+		}
+
+		//cout << "contour_mid: " << contour_mid.size() << "  tar_mid: " << tar_mid.size() << endl;
+		for (int can_num = 0; can_num < total_num; can_num++)
+		{
+			//vector<vector<double>> tar_sec = all_con_tars[can_num];
+			//vector<vector<double>> tar_sec_f = all_con_tars_flip[can_num];
+			vector<vector<double>> tar_sec = all_fea_tars[can_num];
+			vector<vector<double>> tar_sec_f = all_fea_tars_flip[can_num];
+			//cout << "can_num: " << can_num <<  " tar_sec :" << tar_sec.size() << "   tar_sec_f: " << tar_sec_f.size() << endl;
+			vector<pair<int, int>> path;
+			int shift = 0;
+			//double re = tar_mismatch(tar_mid, tar_sec, path, shift, match_width);
+			//double re2 = tar_mismatch(tar_mid, tar_sec_f, path, shift, match_width);
+			double re = tar_mismatch(tar_fea, tar_sec, path, shift, match_width);
+			double re2 = tar_mismatch(tar_fea, tar_sec_f, path, shift, match_width);
+			re = re / (1 + shape_com_mid + all_shape_complexity[can_num]);
+			re2 = re2 / (1 + shape_com_mid + all_shape_complexity[can_num]);
+
+			if (re < re2)
+			{
+				all_result.push_back(re);
+				all_total.push_back(make_pair(can_num, false));
+			}
+			else
+			{
+				all_result.push_back(re2);
+				all_total.push_back(make_pair(can_num, true));
+			}
+		}
+
+		cout << "all_result.size :  " << all_result.size() << "all_total: " << all_total.size() << endl;
+		double temp;
+		pair<int, bool> tempp;
+		int all_size = all_result.size();
+		for (int i = 0; i < all_size - 1; i++)
+			for (int j = 0; j < all_size - 1 - i; j++)
+				if (all_result[j] < all_result[j + 1])
+				{
+					temp = all_result[j];
+					all_result[j] = all_result[j + 1];
+					all_result[j + 1] = temp;
+					tempp = all_total[j];
+					all_total[j] = all_total[j + 1];
+					all_total[j + 1] = tempp;
+				}
+		vector<pair<int, bool>> all_total_mid;
+		for (int t = all_total.size() - 1; t > total_num - 350; t--)
+		{
+			all_total_mid.push_back(all_total[t]);
+			//cout << "order: " << all_total[t].first << "  flip: " << all_total[t].second << " value: " << all_result[t] << " complxeity: " << all_shape_complexity[all_total[t].first] << endl;
+		}
+		int midsize = all_total_mid.size();
+		cout << " midsize: " << midsize << endl;
+		all_total.swap(all_total_mid);
+		return all_total;
+	}
+
+	double Tiling_opt::tar_mismatch(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<pair<int, int>>& path, int &sec_shift, int width) //点对应匹配的筛选框宽度
+	{
+		int first_num = first_arr.size();
+		int second_num = second_arr.size(); //first 作为y轴 ,second为x轴
+		//cout <<  first_num << " - " << second_num << endl;
+		//width = 30;
+		if (first_num != second_num)
+		{
+			cout << "The sampling points of two contours are not equal: " << first_num << " - " << second_num << endl;
+			//return 0;
+		}
+		if (first_arr[0].size() != second_arr[0].size())
+		{
+			cout << "The tar num of each point is not equal: " << first_arr[0].size() << " - " << second_arr[0].size() << endl;
+			return 0;
+		}
+		double min_mis = 10000;
+		vector<pair<int, int>> path_min;
+		//double distance[202][202];
+		//int step[202][202];//记录总的步数
+		//cout << "first: " << first_num << "second: " << second_num << endl;
+		for (int shift = 0; shift < second_num; shift++) //将first固定，分别对齐second的起点
+		{
+			//int ccc = 0;
+			//int ddd = 0;
+			for (int i = 0; i < first_num; i++)
+			{
+				for (int j = 0; j < second_num; j++)
+				{
+					//ddd++;
+					dis[i][j] = 0;
+					if (max(0, i - width) <= j && j <= min(second_num - 1, i + width))
+					{
+						//ccc++;
+						distance[i][j] = 0;
+					}
+					else distance[i][j] = 100000;
+
+				}
+			}
+			//cout << "ccc :  " << ccc <<"ddd: "<<ddd<< endl;
+			//distance[0][0]记录的是对齐的第一个点
+			dis[0][0] = length_two_point_tar(first_arr[0], second_arr[shift]);//
+			distance[0][0] = dis[0][0];
+
+			for (int i = 1; i < first_num; i++)
+			{
+				if (distance[i][0] == 100000) continue;
+				dis[i][0] = length_two_point_tar(first_arr[i], second_arr[shift]);
+				distance[i][0] = distance[i - 1][0] + dis[i][0];
+			}
+			for (int i = 1; i < second_num; i++)
+			{
+				if (distance[0][i] == 100000) continue;
+				dis[0][i] = length_two_point_tar(first_arr[0], second_arr[(i + shift) % second_num]);
+				distance[0][i] = distance[0][i - 1] + dis[0][i];
+			}
+
+			for (int i = 1; i < first_num; i++)
+			{
+				for (int j = 1; j < second_num; j++)
+					//(int i = istart; i <= imax; i++)
+				{
+					if (distance[i][j] == 100000) continue;
+					dis[i][j] = length_two_point_tar(first_arr[i], second_arr[(j + shift) % second_num]);
+					double g1 = distance[i - 1][j] + dis[i][j];
+					double g2 = distance[i - 1][j - 1] + dis[i][j];
+					double g3 = distance[i][j - 1] + dis[i][j];
+					if (g1 < g2)
+					{
+						if (g1 < g3) distance[i][j] = g1;
+						else distance[i][j] = g3;
+					}
+					else
+					{
+						if (g2 < g3) distance[i][j] = g2;
+						else distance[i][j] = g3;
+					}
+				}
+			}
+			//for (int i = 0; i < first_num; i++)
+			//{
+			//	cout << endl;
+			//	for (int j = 0; j < second_num; j++)
+			//		//(int i = istart; i <= imax; i++)
+			//	{
+			//		if (distance[i][j] == 100000) cout <<  "  0   ";
+			//		else cout << distance[i][j] << "  ";
+			//	}
+			//}
+			//cout << "shift " << shift << "  distance[first_num - 1][second_num - 1]:  " << distance[first_num - 1][second_num - 1] << endl;
+			if (distance[first_num - 1][second_num - 1] < min_mis)
+			{
+				path_min.swap(vector<pair<int, int>>());
+				min_mis = distance[first_num - 1][second_num - 1];
+				print_TAR_Path(dis, distance, first_num - 1, second_num - 1, path_min);
+				sec_shift = shift;
+			}
+		}
+		path = path_min;
+		return min_mis;
+	}
+
+	void Tiling_opt::print_TAR_Path(double d[][202], double dp[][202], int i, int j, vector<pair<int, int>>& path)
+	{
+		if (i == 0 && j == 0) {
+			//cout << first_arr[i] << " - " << second_arr[j] << endl;
+			path.push_back(make_pair(i, j));
+			return;
+		}
+
+		if (abs(dp[i][j] - (dp[i - 1][j - 1] + dis[i][j])) < 0.001){
+			print_TAR_Path(d, dp, i - 1, j - 1, path);
+
+		}
+		else if (abs(dp[i][j] - (dp[i][j - 1] + dis[i][j])) < 0.001) {
+			print_TAR_Path(d, dp, i, j - 1, path);
+
+		}
+		else {
+			print_TAR_Path(d, dp, i - 1, j, path);
+		}
+		path.push_back(make_pair(i, j));
+	}
+
+	vector<int> Tiling_opt::joint_relocate(vector<Point2f> contour_, vector<int> joint_index, int num_c) //将原始轮廓上的划分点对应到采样后的轮廓上
+	{
+		vector<Point2f> contour_mid = sampling(contour_, num_c + 1);//选择最少的点进行比较
+		int con_size = contour_mid.size();
+		vector<int> mid_in;
+		for (int i = 0; i <joint_index.size(); i++)
+		{
+			int index_ = 0;
+			double dist = 10000;
+			for (int t = 0; t <con_size; t++)
+			{
+				if (length_two_point2f(contour_[joint_index[i]], contour_mid[t]) < dist)
+				{
+					dist = length_two_point2f(contour_[joint_index[i]], contour_mid[t]);
+					index_ = t;
+				}
+			}
+			mid_in.push_back(index_);
+		}
+		return mid_in;
+	}
+
+	vector<int> Tiling_opt::morphed_results(vector<Point2f> &morphed_A)
+	{
+		cout << "cand_paths num: " << cand_paths.size() << endl;
+		vector<Point2f> final_pettern;
+		vector<int> mid_inter_new;		
+		vector<pair<int, int>> path = cand_paths[Candidate_index];
+
+		int psize = path.size();
+		cout << "path size: " << psize << endl;
+		vector<Point2f> contour1 = poly_mid->contour_sample[1];
+		vector<Point2f> contour2 = poly_second->contour_sample[1];
+		int t = 0;
+		for (int i = 0; i < psize; i++)
+		{
+			int first = path[i].first;
+			int sec = path[i].second;
+			Point2f fin = 0.5 * contour1[first] + 0.5 * contour2[sec];;
+			if (t<4 && first == mid_inter[t])
+			{
+				//cout << t << " " << first << "  " << i << endl;
+				t++;
+				mid_inter_new.push_back(i);
+			}
+			final_pettern.push_back(fin);
+		}	
+		mid_inter_new = joint_relocate(final_pettern, mid_inter_new, 1);
+		final_pettern = sampling(final_pettern, 2);
+
+		if (mid_inter_new.size() != 4)
+		{
+			cout << "lack of tiling vertices!" << endl;
+			return mid_inter_new;
+		}
+
+		int first = 0;
+		int second = 0;
+
+		vector<int> return_p;
+		vector<vector<Point2f>> four_place;
+		morphed_A = extract_contour(final_pettern, mid_inter_new, return_p, four_place, all_inner_conts[Tiling_index].type);   //
+		
+		int times = 0;
+		while (self_intersect(morphed_A, first, second) && (times < 3))
+		{
+			++times;
+			cout << "morphed_A self_intersect is repairing" << endl;
+			contour_fine_tuning(morphed_A, first, second);
+		}
+		//cout << "times" << times << endl;
+		four_place.swap(vector<vector<Point2f>>());
+		mid_inter_new.swap(vector<int>());
+		final_pettern = extract_contour(morphed_A, return_p, mid_inter_new, four_place, all_inner_conts[Tiling_index].type);
+		cout << "lack of mid_inter_new: " << mid_inter_new.size() << endl;
+		poly_tem->loadPoints(final_pettern);
+		poly_tem->contour_sampling();
+		return mid_inter_new;
+	}
+
+	void Tiling_opt::contour_fine_tuning(vector<Point2f> &contour_, int first, int second)
+	{
+		vector<Point2f> mid_con;
+		int csize = contour_.size();
+		vector<Point2f> pre;
+		vector<Point2f> post;
+		cout << csize << " " << first << " " << second << endl;
+		if (second - first < 4)
+		{
+			Point2f tem = contour_[first + 1];
+			contour_[first + 1] = contour_[second];
+			contour_[second] = tem;
+		}
+		else
+		{
+			int mid = (first + second) / 2;
+			for (int t = first; t < mid; t++)
+			{
+				pre.push_back(contour_[t]);
+			}
+			for (int t = mid; t <= second + 1; t++)
+			{
+				post.push_back(contour_[t]);
+			}
+			for (int t = 0; t < first; t++)
+			{
+				mid_con.push_back(contour_[t]);
+			}
+			if (mid_con.empty()) mid_con.push_back(0.5*contour_[csize - 1] + 0.5*post[post.size() - 2]);
+			else mid_con.push_back(0.5*mid_con.back() + 0.5*post[post.size() - 2]);
+			for (int t = post.size() - 2; t >= 0; t--)
+			{
+				mid_con.push_back(post[t]);
+			}
+			for (int t = pre.size() - 1; t > 0; t--)
+			{
+				mid_con.push_back(pre[t]);
+			}
+			mid_con.push_back(0.5*mid_con.back() + 0.5*contour_[(second + 2) % csize]);
+			for (int t = second + 2; t < csize; t++)
+			{
+				mid_con.push_back(contour_[t]);
+			}
+			contour_.swap(mid_con);
+		}
 	}
 
 	bool Tiling_opt::coll_detec_bbx(vector<Point2f> contour1, vector<Point2f> contour2, int threshold)

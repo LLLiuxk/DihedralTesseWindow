@@ -39,20 +39,25 @@ private:
 	QGraphicsScene scene_6;
 	QPolygonF poly1;
 	QPolygonF poly2;
-	QPolygon poly3;
+
 	QGraphicsPolygonItem *Poly1;
 	QGraphicsPolygonItem *Poly2;
+	QGraphicsPolygonItem *Poly3;
+	QGraphicsPolygonItem *Poly4;
 
 	QRect winRect[7];
 	QPoint lastPoint;
 
 	Tiling_opt *tiling_opt;
 
-
+	QProgressDialog *pd;
+	QTimer *t;
 
 public Q_SLOTS:
 	void on_actionLoadInput_triggered();
 	void on_actionCompute_triggered();
+	void on_actionMatchCandidate_triggered();
+	void on_actionMorphing_triggered();
 	//void on_actionSaveMiddle_triggered();
 	void on_actionClear_triggered();
 
@@ -63,12 +68,16 @@ protected:
 	void wheelEvent(QWheelEvent *event);
 	void mousePressEvent(QMouseEvent *event);
 	//void mouseMoveEvent(QMouseEvent *event);
+
+	void keyPressEvent(QKeyEvent *event);
+
 	void resizeEvent(QResizeEvent *event);
 	void moveEvent(QMoveEvent *event);
 	//bool eventFilter(QObject *o, QEvent *e);
 
 
 	void InitialData();
+
 
 Q_SIGNALS:
 	void changed();

@@ -10,7 +10,7 @@ namespace Tiling_tiles{
 	PolygonTile::PolygonTile(string filename)	
 	{
 		string t = filename.substr(filename.size() - 3, filename.size() - 1);
-		cout << t;
+		//cout << t<<endl;
 		if (t == "txt")  //已有点数据
 		{
 			txtpath = filename;

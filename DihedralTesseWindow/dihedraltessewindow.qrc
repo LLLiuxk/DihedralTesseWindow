@@ -1,7 +1,8 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/match.png</file>
     <file>icons/fileNew.png</file>
     <file>icons/fileOpen.png</file>
-    <file>icons/fileNew.png</file>
+    <file>icons/morphing.png</file>
   </qresource>
 </RCC>

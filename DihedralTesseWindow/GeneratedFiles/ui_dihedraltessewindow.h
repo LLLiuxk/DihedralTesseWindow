@@ -33,6 +33,8 @@ public:
     QAction *actionCompute;
     QAction *actionSaveMiddle;
     QAction *actionClear;
+    QAction *actionMatchCandidate;
+    QAction *actionMorphing;
     QWidget *centralWidget;
     QHBoxLayout *hboxLayout;
     QSplitter *splitter;
@@ -54,7 +56,7 @@ public:
     {
         if (DihedralTesseWindowClass->objectName().isEmpty())
             DihedralTesseWindowClass->setObjectName(QStringLiteral("DihedralTesseWindowClass"));
-        DihedralTesseWindowClass->resize(1600, 1000);
+        DihedralTesseWindowClass->resize(1605, 1000);
         actionLoadInput = new QAction(DihedralTesseWindowClass);
         actionLoadInput->setObjectName(QStringLiteral("actionLoadInput"));
         QIcon icon;
@@ -62,17 +64,25 @@ public:
         actionLoadInput->setIcon(icon);
         actionCompute = new QAction(DihedralTesseWindowClass);
         actionCompute->setObjectName(QStringLiteral("actionCompute"));
-        QIcon icon1;
-        icon1.addFile(QStringLiteral(":/icons/icons/fileNew.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionCompute->setIcon(icon1);
+        actionCompute->setIcon(icon);
         actionSaveMiddle = new QAction(DihedralTesseWindowClass);
         actionSaveMiddle->setObjectName(QStringLiteral("actionSaveMiddle"));
-        QIcon icon2;
-        icon2.addFile(QStringLiteral(":/icons/icons/fileOpen.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionSaveMiddle->setIcon(icon2);
+        QIcon icon1;
+        icon1.addFile(QStringLiteral(":/icons/icons/fileOpen.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionSaveMiddle->setIcon(icon1);
         actionClear = new QAction(DihedralTesseWindowClass);
         actionClear->setObjectName(QStringLiteral("actionClear"));
         actionClear->setIcon(icon);
+        actionMatchCandidate = new QAction(DihedralTesseWindowClass);
+        actionMatchCandidate->setObjectName(QStringLiteral("actionMatchCandidate"));
+        QIcon icon2;
+        icon2.addFile(QStringLiteral(":/icons/icons/match.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionMatchCandidate->setIcon(icon2);
+        actionMorphing = new QAction(DihedralTesseWindowClass);
+        actionMorphing->setObjectName(QStringLiteral("actionMorphing"));
+        QIcon icon3;
+        icon3.addFile(QStringLiteral(":/icons/icons/morphing.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionMorphing->setIcon(icon3);
         centralWidget = new QWidget(DihedralTesseWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         hboxLayout = new QHBoxLayout(centralWidget);
@@ -156,7 +166,7 @@ public:
         DihedralTesseWindowClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(DihedralTesseWindowClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1600, 23));
+        menuBar->setGeometry(QRect(0, 0, 1605, 23));
         menu = new QMenu(menuBar);
         menu->setObjectName(QStringLiteral("menu"));
         DihedralTesseWindowClass->setMenuBar(menuBar);
@@ -174,6 +184,8 @@ public:
         menu->addAction(actionClear);
         mainToolBar->addAction(actionLoadInput);
         mainToolBar->addAction(actionCompute);
+        mainToolBar->addAction(actionMatchCandidate);
+        mainToolBar->addAction(actionMorphing);
         mainToolBar->addAction(actionSaveMiddle);
         mainToolBar->addAction(actionClear);
 
@@ -189,6 +201,11 @@ public:
         actionCompute->setText(QApplication::translate("DihedralTesseWindowClass", "Compute Tiling", 0));
         actionSaveMiddle->setText(QApplication::translate("DihedralTesseWindowClass", "Save Middle", 0));
         actionClear->setText(QApplication::translate("DihedralTesseWindowClass", "Clear", 0));
+        actionMatchCandidate->setText(QApplication::translate("DihedralTesseWindowClass", "MatchCandidate", 0));
+#ifndef QT_NO_TOOLTIP
+        actionMatchCandidate->setToolTip(QApplication::translate("DihedralTesseWindowClass", "MatchCandidate", 0));
+#endif // QT_NO_TOOLTIP
+        actionMorphing->setText(QApplication::translate("DihedralTesseWindowClass", "Morphing", 0));
         menu->setTitle(QApplication::translate("DihedralTesseWindowClass", "File", 0));
     } // retranslateUi
 
