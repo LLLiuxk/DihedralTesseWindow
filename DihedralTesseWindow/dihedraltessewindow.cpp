@@ -60,6 +60,7 @@ DihedralTesseWindow::on_actionLoadInput_triggered()
 	Poly1 = new QGraphicsPolygonItem(tiling_opt->poly_first->poly);
 	Poly1->setPen(QPen(Qt::blue, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 	Poly1->setBrush(QBrush(Qt::black));
+	scene_2.clear();
 	scene_2.addItem(Poly1);
 	scene_2.setItemIndexMethod(QGraphicsScene::NoIndex);
 	scene_2.setSceneRect(0, 0, 600, 600);
@@ -67,7 +68,7 @@ DihedralTesseWindow::on_actionLoadInput_triggered()
 	ui.graphicsView_2->setScene(&scene_2);
 	//ui.graphicsView_2->setSceneRect(10, 10, 600, 600);
 	//ui.graphicsView_2->setSceneRect(Polygon1.poly_c.x - 300, Polygon1.poly_c.y - 300, 600, 600);
-	ui.graphicsView_2->scale(0.5, 0.5);
+	ui.graphicsView_2->fitInView(scene_2.sceneRect(), Qt::KeepAspectRatio);
 	ui.graphicsView_2->show();
 
 	outt << winRect[0] << winRect[1] << winRect[2] << winRect[3];
@@ -106,13 +107,13 @@ DihedralTesseWindow::on_actionLoadInput_triggered()
 void 
 DihedralTesseWindow::on_actionCompute_triggered()
 {
-	int step = 1;
-	pd = new QProgressDialog(this);
-	pd->setOrientation(Qt::Horizontal);  // 水平方向  
-	pd->setMinimum(0);  // 最小值  
-	pd->setMaximum(100);  // 最大值  
-	pd->setValue(0);  // 当前进度 
-	pd->show();
+	//int step = 1;
+	//pd = new QProgressDialog(this);
+	//pd->setOrientation(Qt::Horizontal);  // 水平方向  
+	//pd->setMinimum(0);  // 最小值  
+	//pd->setMaximum(100);  // 最大值  
+	//pd->setValue(0);  // 当前进度 
+	//pd->show();
 
 	int result = tiling_opt->tiliing_generation();
 	QString message;
@@ -124,7 +125,7 @@ DihedralTesseWindow::on_actionCompute_triggered()
 	}
 	else if (result == 2)
 	{
-		message = "The  file/dir had been Exisit!";
+		message = "The tiling results had been computed!";
 		reply = QMessageBox::information(this, tr("Information"), message);
 	}
 	else if (result == 3)
@@ -150,13 +151,16 @@ DihedralTesseWindow::on_actionCompute_triggered()
 		Poly2 = new QGraphicsPolygonItem(tiling_opt->poly_mid->poly);
 		Poly2->setPen(QPen(Qt::blue, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 		Poly2->setBrush(QBrush(Qt::black));
+		scene_3.clear();
 		scene_3.addItem(Poly2);
 		scene_3.setItemIndexMethod(QGraphicsScene::NoIndex);
-		Point2f cen = tiling_opt->poly_mid->poly_c;
-		scene_3.setSceneRect(cen.x - 300, cen.y-300, 600, 600);
+		QRectF bbox = Q_bbox(tiling_opt->poly_mid->contour);
+		QRectF cen_b = QRectF(bbox.topLeft() - QPointF(100, 100), bbox.bottomRight() + QPointF(100, 100));
+		scene_3.setSceneRect(cen_b);//
 		//scene1.setSceneRect(0, 0, 400, 400);
 		ui.graphicsView_3->setScene(&scene_3);
 		ui.graphicsView_3->fitInView(scene_3.sceneRect(), Qt::KeepAspectRatio);
+		//outt << "scene_3:" << scene_3.sceneRect() << endl << "graphicsView_3: " << ui.graphicsView_3->rect();
 		ui.graphicsView_3->scale(0.75, 0.75);
 		//ui.graphicsView_2->setSceneRect(10, 10, 600, 600);
 		//ui.graphicsView_2->setSceneRect(Polygon1.poly_c.x - 300, Polygon1.poly_c.y - 300, 600, 600);
@@ -222,17 +226,10 @@ DihedralTesseWindow::on_actionMorphing_triggered()
 	ui.graphicsView_5->show();
 
 	QString pixpath1 = "D:\\VisualStudioProjects\\DihedralTesseWindow\\result\\gv2\\tiling_result.png";
-	QString pixpath2 = "D:\\VisualStudioProjects\\DihedralTesseWindow\\result\\gv2\\morphedA.png";
 	Mat drawing_result = Mat(2000, 2000, CV_8UC3, Scalar(0, 0, 0));
-	Mat drawing_mA = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
 	draw_allplane(drawing_result, tiling_opt->poly_tem->contour_sample[1], mid_inter_new, 0.4, tiling_opt->all_inner_conts[tiling_opt->Tiling_index].type);
-	cout << "morphed_A num: " << morphed_A.size() << endl;
-	draw_poly(drawing_mA, morphed_A, Point2f(300,300), 0);
 	imwrite(pixpath1.toStdString(), drawing_result);
-	imwrite(pixpath2.toStdString(), drawing_mA);
-
 	QPixmap *pixmap1 = new QPixmap(pixpath1);
-	QPixmap *pixmap2 = new QPixmap(pixpath2);
 	scene2.addPixmap(*pixmap1);
 	scene2.setSceneRect(0, 0, 1600, 1600);
 	//scene1.setSceneRect(0, 0, 400, 400);
@@ -241,11 +238,20 @@ DihedralTesseWindow::on_actionMorphing_triggered()
 	//ui.graphicsView2->fitInView(scene2.sceneRect(), Qt::KeepAspectRatio);
 	ui.graphicsView2->show();
 
-	scene_6.addPixmap(*pixmap2);
-	scene_6.setSceneRect(0, 0, 800, 800);
+	poly1 = QPolygonF(vecp_cv2qt(morphed_A));
+	Poly5 = new QGraphicsPolygonItem(poly1);
+	Poly5->setPen(QPen(Qt::red, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+	Poly5->setBrush(QBrush(Qt::black));
+	scene_6.addItem(Poly5);
+	scene_6.setItemIndexMethod(QGraphicsScene::NoIndex);
+	Point2f cen2 = center_p(morphed_A);
+	scene_6.setSceneRect(cen2.x - 300, cen2.y - 300, 600, 600);
 	//scene1.setSceneRect(0, 0, 400, 400);
 	ui.graphicsView_6->setScene(&scene_6);
 	ui.graphicsView_6->fitInView(scene_6.sceneRect(), Qt::KeepAspectRatio);
+	ui.graphicsView_6->scale(0.75, 0.75);
+	//ui.graphicsView_2->setSceneRect(10, 10, 600, 600);
+	//ui.graphicsView_2->setSceneRect(Polygon1.poly_c.x - 300, Polygon1.poly_c.y - 300, 600, 600);
 	ui.graphicsView_6->show();
 	
 	
@@ -286,6 +292,7 @@ DihedralTesseWindow::wheelEvent(QWheelEvent *event)
 		if (winRect[4].contains(temp))  ui.graphicsView_4->scale(1 - s_factor, 1 - s_factor);
 		if (winRect[5].contains(temp))  ui.graphicsView_5->scale(1 - s_factor, 1 - s_factor);
 		if (winRect[6].contains(temp))  ui.graphicsView_6->scale(1 - s_factor, 1 - s_factor);
+		outt << "1 - s_factor:" << ui.graphicsView_6->rect();
 	}
 	else
 	{

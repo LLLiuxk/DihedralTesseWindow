@@ -39,7 +39,7 @@ namespace Tiling_tiles{
 	//draw tool
 	void MyLine(Mat img, Point2f start, Point2f end, string color1);
 	Mat draw_polygen(string win_name, vector<Point2f> contour_s);
-	void draw_poly(Mat &drawing_, vector<Point2f> contour_s, Point2f center, int color = -1);
+	void draw_poly(Mat &drawing_, vector<Point2f> contour_s, Point2f center, int color = -1); //很重要，检测碰撞,不要轻易改
 	void draw_allplane(Mat &drawing_, vector<Point2f> contour_, vector<int> vec_, double scale = 1, int type = 0);
 	void draw_result(Mat &drawing_, vector<Point2f> contour_, vector<int> vec_, double scale = 1, int type = 0, Point2f shift = Point2f(0, 0));
 

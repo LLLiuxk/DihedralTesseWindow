@@ -44,6 +44,7 @@ private:
 	QGraphicsPolygonItem *Poly2;
 	QGraphicsPolygonItem *Poly3;
 	QGraphicsPolygonItem *Poly4;
+	QGraphicsPolygonItem *Poly5;
 
 	QRect winRect[7];
 	QPoint lastPoint;

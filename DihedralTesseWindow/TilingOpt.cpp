@@ -22,19 +22,38 @@ namespace Tiling_tiles{
 
 	void Tiling_opt::Tiling_clear()
 	{
-		/*memset(dis, 0, sizeof(dis));
-		memset(dis_cur, 0, sizeof(dis_cur));
+		poly_first->poly_clear();
+		poly_mid->poly_clear();
+		poly_second->poly_clear();
+		poly_tem->poly_clear();
+
+		memset(dis, 0, sizeof(dis));
 		memset(distance, 0, sizeof(distance));
 		memset(step, 0, sizeof(step));
-		prototile_first->Pro_clear();
-		prototile_mid->Pro_clear();
-		prototile_second->Pro_clear();
-		prototile_tem->Pro_clear();
-		contour_dataset.swap(vector<vector<Point2f>>());*/
+
+		contour_dataset.swap(vector<vector<Point2f>>());
+		all_con_tars.swap(vector<vector<vector<double>>>());
+		all_con_tars_flip.swap(vector<vector<vector<double>>>());
+		all_fea_tars.swap(vector<vector<vector<double>>>());
+		all_fea_tars_flip.swap(vector<vector<vector<double>>>());
+		all_shape_complexity.swap(vector<double>());
+		all_inner_conts.swap(vector<inPat>());
+
+		Tiling_index = 0;
+		Candidate_index = 0;
+		all_tiling_Mat.swap(vector<Mat>());
+		candidate_contours.swap(vector<vector<Point2f>>());
+		cand_paths.swap(vector<vector<pair<int, int>>>());
+		mid_inter.swap(vector<int>());
+
 	}
 
 	void Tiling_opt::initial(string file)
 	{
+		if (!poly_first->contour.empty())
+		{
+			Tiling_clear();
+		}
 		poly_first = new PolygonTile(file);
 		poly_first->drawPolygon();
 		//load_dataset();
@@ -57,9 +76,7 @@ namespace Tiling_tiles{
 
 	int Tiling_opt::tiliing_generation()
 	{
-		clock_t start, midtime, finish;
-		start = clock();
-		bool check_self_intersect = true;
+		if (!all_inner_conts.empty()) return 2;
 		int num_c = 1;//Ñ¡Ôñ(num_c+1)*100¸öµã
 		if (poly_first->contour.empty())
 		{

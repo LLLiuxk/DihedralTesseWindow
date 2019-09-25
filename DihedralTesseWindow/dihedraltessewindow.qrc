@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/fileSave.png</file>
     <file>icons/match.png</file>
     <file>icons/compute.png</file>
     <file>icons/fileNew.png</file>

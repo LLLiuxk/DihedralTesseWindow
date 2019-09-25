@@ -123,7 +123,7 @@
      <x>0</x>
      <y>0</y>
      <width>1605</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -173,7 +173,7 @@
   <action name="actionSaveMiddle">
    <property name="icon">
     <iconset resource="dihedraltessewindow.qrc">
-     <normaloff>:/icons/icons/fileOpen.png</normaloff>:/icons/icons/fileOpen.png</iconset>
+     <normaloff>:/icons/icons/fileSave.png</normaloff>:/icons/icons/fileSave.png</iconset>
    </property>
    <property name="text">
     <string>Save Middle</string>

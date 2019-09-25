@@ -70,7 +70,7 @@ public:
         actionSaveMiddle = new QAction(DihedralTesseWindowClass);
         actionSaveMiddle->setObjectName(QStringLiteral("actionSaveMiddle"));
         QIcon icon2;
-        icon2.addFile(QStringLiteral(":/icons/icons/fileOpen.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QStringLiteral(":/icons/icons/fileSave.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionSaveMiddle->setIcon(icon2);
         actionClear = new QAction(DihedralTesseWindowClass);
         actionClear->setObjectName(QStringLiteral("actionClear"));
@@ -168,7 +168,7 @@ public:
         DihedralTesseWindowClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(DihedralTesseWindowClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1605, 26));
+        menuBar->setGeometry(QRect(0, 0, 1605, 23));
         menu = new QMenu(menuBar);
         menu->setObjectName(QStringLiteral("menu"));
         DihedralTesseWindowClass->setMenuBar(menuBar);

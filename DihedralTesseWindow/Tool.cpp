@@ -70,7 +70,7 @@ namespace Tiling_tiles{
 		//imshow(win_name, drawing_pro);
 		return drawing_pro;
 	}
-	void draw_poly(Mat &drawing_, vector<Point2f> contour_s, Point2f center, int color)
+	void draw_poly(Mat &drawing_, vector<Point2f> contour_s, Point2f center, int color)  //很重要，检测碰撞,不要轻易改
 	{
 		Scalar col_sca = Scalar(0, 0, 0);
 		if (color < colorbar.size() && color>0)
@@ -967,7 +967,7 @@ namespace Tiling_tiles{
 		return four_cor;
 	}
 
-	QRectF Qbbox(vector<Point2f> contour)
+	QRectF Q_bbox(vector<Point2f> contour)
 	{
 		double bbx_max_x = -10000;
 		double bbx_max_y = -10000;

@@ -467,7 +467,8 @@ namespace Tiling_tiles{
 	void PolygonTile::drawPolygon()
 	{
 		Mat drawing_pro = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
-		draw_poly(drawing_pro, contour, Point2f(300,300));
+		Point2f cen_b = Point2f(300, 300) + center_p(contour) - center_p(b_box(contour));
+		draw_poly(drawing_pro, contour, cen_b);
 		imshow("Input image", drawing_pro);
 	}
 
