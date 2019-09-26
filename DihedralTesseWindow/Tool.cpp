@@ -804,6 +804,22 @@ namespace Tiling_tiles{
 		}
 	}
 
+	int locate_p(Point2f input, vector<Point2f> contour)
+	{
+		int con_size = contour.size();
+		int index_ = 0;
+		double dist = 10000;
+		for (int t = 0; t <con_size; t++)
+		{
+			if (length_two_point2f(input, contour[t]) < dist)
+			{
+				dist = length_two_point2f(input, contour[t]);
+				index_ = t;
+			}
+		}
+		return index_;
+	}
+
 	vector<int> feature_points(vector<Point2f> contour_, double dmin, double dmax, double angle_cos)
 	{
 		vector<int> index_num;

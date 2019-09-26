@@ -12,6 +12,10 @@
 #include <QInputDialog> 
 #include <QDebug>
 #include <QGraphicsItem>
+#include <QElapsedTimer>
+#include <QPainter>
+#include <QPen>
+#include <QSvgGenerator>
 
 #include "ui_dihedraltessewindow.h"
 #include "TilingOpt.h"
@@ -45,6 +49,8 @@ private:
 	QGraphicsPolygonItem *Poly3;
 	QGraphicsPolygonItem *Poly4;
 	QGraphicsPolygonItem *Poly5;
+	
+	vector<QGraphicsEllipseItem *> EllipseItem;
 
 	QRect winRect[7];
 	QPoint lastPoint;
@@ -54,12 +60,14 @@ private:
 	QProgressDialog *pd;
 	QTimer *t;
 
+
 public Q_SLOTS:
 	void on_actionLoadInput_triggered();
 	void on_actionCompute_triggered();
 	void on_actionMatchCandidate_triggered();
 	void on_actionMorphing_triggered();
-	//void on_actionSaveMiddle_triggered();
+	void on_actionModify_triggered();
+	void on_actionSaveSVG_triggered();
 	void on_actionClear_triggered();
 
 	void openfile(QString);
@@ -76,9 +84,8 @@ protected:
 	void moveEvent(QMoveEvent *event);
 	//bool eventFilter(QObject *o, QEvent *e);
 
-
 	void InitialData();
-
+	void exportSVG(QGraphicsView* view);
 
 Q_SIGNALS:
 	void changed();

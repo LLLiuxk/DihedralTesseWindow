@@ -132,7 +132,7 @@
     </property>
     <addaction name="actionLoadInput"/>
     <addaction name="actionCompute"/>
-    <addaction name="actionSaveMiddle"/>
+    <addaction name="actionSaveSVG"/>
     <addaction name="actionClear"/>
    </widget>
    <addaction name="menu"/>
@@ -148,14 +148,15 @@
    <addaction name="actionCompute"/>
    <addaction name="actionMatchCandidate"/>
    <addaction name="actionMorphing"/>
-   <addaction name="actionSaveMiddle"/>
+   <addaction name="actionModify"/>
+   <addaction name="actionSaveSVG"/>
    <addaction name="actionClear"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionLoadInput">
    <property name="icon">
     <iconset resource="dihedraltessewindow.qrc">
-     <normaloff>:/icons/icons/fileNew.png</normaloff>:/icons/icons/fileNew.png</iconset>
+     <normaloff>:/icons/icons/fileOpen.png</normaloff>:/icons/icons/fileOpen.png</iconset>
    </property>
    <property name="text">
     <string>Load Input</string>
@@ -170,13 +171,13 @@
     <string>Compute Tiling</string>
    </property>
   </action>
-  <action name="actionSaveMiddle">
+  <action name="actionSaveSVG">
    <property name="icon">
     <iconset resource="dihedraltessewindow.qrc">
      <normaloff>:/icons/icons/fileSave.png</normaloff>:/icons/icons/fileSave.png</iconset>
    </property>
    <property name="text">
-    <string>Save Middle</string>
+    <string>Export SVG</string>
    </property>
   </action>
   <action name="actionClear">
@@ -207,6 +208,15 @@
    </property>
    <property name="text">
     <string>Morphing</string>
+   </property>
+  </action>
+  <action name="actionModify">
+   <property name="icon">
+    <iconset resource="dihedraltessewindow.qrc">
+     <normaloff>:/icons/icons/modify.png</normaloff>:/icons/icons/modify.png</iconset>
+   </property>
+   <property name="text">
+    <string>Modify</string>
    </property>
   </action>
  </widget>

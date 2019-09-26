@@ -166,10 +166,16 @@ namespace Tiling_tiles{
 		//中间数据
 		int Tiling_index;
 		int Candidate_index;
+		bool modify;
+		bool chosen;
+		int chosen_index;
 		vector<Mat> all_tiling_Mat;
 		vector<vector<Point2f>> candidate_contours;
 		vector<vector<pair<int, int>>> cand_paths;
 		vector<int> mid_inter; //每个tiling placement对应一个mid_inter
+		vector<int> mid_inter_morphed; //变形后的mid_inter
+
+		vector<Point2f> modifying_c;
 
 	};
 }

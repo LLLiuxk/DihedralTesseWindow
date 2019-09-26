@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_DihedralTesseWindow_t {
-    QByteArrayData data[10];
-    char stringdata0[195];
+    QByteArrayData data[12];
+    char stringdata0[248];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,9 +36,11 @@ QT_MOC_LITERAL(3, 29, 28), // "on_actionLoadInput_triggered"
 QT_MOC_LITERAL(4, 58, 26), // "on_actionCompute_triggered"
 QT_MOC_LITERAL(5, 85, 33), // "on_actionMatchCandidate_trigg..."
 QT_MOC_LITERAL(6, 119, 27), // "on_actionMorphing_triggered"
-QT_MOC_LITERAL(7, 147, 24), // "on_actionClear_triggered"
-QT_MOC_LITERAL(8, 172, 8), // "openfile"
-QT_MOC_LITERAL(9, 181, 13) // "winRectupdate"
+QT_MOC_LITERAL(7, 147, 25), // "on_actionModify_triggered"
+QT_MOC_LITERAL(8, 173, 26), // "on_actionSaveSVG_triggered"
+QT_MOC_LITERAL(9, 200, 24), // "on_actionClear_triggered"
+QT_MOC_LITERAL(10, 225, 8), // "openfile"
+QT_MOC_LITERAL(11, 234, 13) // "winRectupdate"
 
     },
     "DihedralTesseWindow\0changed\0\0"
@@ -46,6 +48,8 @@ QT_MOC_LITERAL(9, 181, 13) // "winRectupdate"
     "on_actionCompute_triggered\0"
     "on_actionMatchCandidate_triggered\0"
     "on_actionMorphing_triggered\0"
+    "on_actionModify_triggered\0"
+    "on_actionSaveSVG_triggered\0"
     "on_actionClear_triggered\0openfile\0"
     "winRectupdate"
 };
@@ -57,7 +61,7 @@ static const uint qt_meta_data_DihedralTesseWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       8,   14, // methods
+      10,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -65,21 +69,25 @@ static const uint qt_meta_data_DihedralTesseWindow[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   54,    2, 0x06 /* Public */,
+       1,    0,   64,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       3,    0,   55,    2, 0x0a /* Public */,
-       4,    0,   56,    2, 0x0a /* Public */,
-       5,    0,   57,    2, 0x0a /* Public */,
-       6,    0,   58,    2, 0x0a /* Public */,
-       7,    0,   59,    2, 0x0a /* Public */,
-       8,    1,   60,    2, 0x0a /* Public */,
-       9,    0,   63,    2, 0x0a /* Public */,
+       3,    0,   65,    2, 0x0a /* Public */,
+       4,    0,   66,    2, 0x0a /* Public */,
+       5,    0,   67,    2, 0x0a /* Public */,
+       6,    0,   68,    2, 0x0a /* Public */,
+       7,    0,   69,    2, 0x0a /* Public */,
+       8,    0,   70,    2, 0x0a /* Public */,
+       9,    0,   71,    2, 0x0a /* Public */,
+      10,    1,   72,    2, 0x0a /* Public */,
+      11,    0,   75,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void,
 
  // slots: parameters
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -102,9 +110,11 @@ void DihedralTesseWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
         case 2: _t->on_actionCompute_triggered(); break;
         case 3: _t->on_actionMatchCandidate_triggered(); break;
         case 4: _t->on_actionMorphing_triggered(); break;
-        case 5: _t->on_actionClear_triggered(); break;
-        case 6: _t->openfile((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 7: _t->winRectupdate(); break;
+        case 5: _t->on_actionModify_triggered(); break;
+        case 6: _t->on_actionSaveSVG_triggered(); break;
+        case 7: _t->on_actionClear_triggered(); break;
+        case 8: _t->openfile((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 9: _t->winRectupdate(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -144,13 +154,13 @@ int DihedralTesseWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 10)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 10;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 8)
+        if (_id < 10)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 8;
+        _id -= 10;
     }
     return _id;
 }

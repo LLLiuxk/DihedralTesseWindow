@@ -52,6 +52,7 @@ namespace Tiling_tiles{
 	double length_two_point2f(Point2f &u, Point2f &v);
 	double length_two_point_tar(vector<double> &p1, vector<double> &p2);
 	void move_con(vector<Point2f> &con, Point2f sh);
+	int locate_p(Point2f input,vector<Point2f> contour);
 
 	vector<int> feature_points(vector<Point2f> contour_, double dmin, double dmax, double angle_cos);
 

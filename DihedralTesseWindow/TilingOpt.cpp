@@ -8,9 +8,12 @@ namespace Tiling_tiles{
 		poly_mid = new PolygonTile();
 		poly_second = new PolygonTile();
 		poly_tem = new PolygonTile();
-		all_types = 500;
+		all_types = 10;
 		Tiling_index = 0;
 		Candidate_index = 0;
+		modify = false;
+		chosen = false;
+		chosen_index = 0;
 		//memset(dp, 0, sizeof(dp));
 		//memset(dp_inver, 0, sizeof(dp_inver));
 
@@ -102,9 +105,9 @@ namespace Tiling_tiles{
 		}
 		//mkdir(na);
 
-		int trans = 0; //Tanslation_rule(p_p_index, contour_, rootname);
+		int trans = Tanslation_rule(p_p_index, contour_, rootname);
 		int rotas = 0;// Rotation_rule(p_p_index, contour_, rootname);
-		int flips = Flipping_rule(p_p_index, contour_, rootname);
+		int flips = 0;// Flipping_rule(p_p_index, contour_, rootname);
 		int count = trans + rotas + flips;
 		cout << "succeed count: " << count << " trans: " << trans << " rotat: " << rotas << " flips: " << flips << endl;
 		//midtime = clock();
@@ -1143,7 +1146,7 @@ namespace Tiling_tiles{
 				}
 		//cout << "the fianl order: " << endl;
 		vector<pair<int, bool>> all_total_mid;
-		for (int t = total_num - 1; t > total_num - 150; t--)
+		for (int t = total_num - 1; t > total_num - 9; t--)
 		{
 			all_total_mid.push_back(all_final[t]);
 			cout << "order: " << all_final[t].first << "  flip: " << all_final[t].second << " value: " << all_result[t] << " complxeity: " << all_shape_complexity[all_final[t].first] << endl;
@@ -1215,7 +1218,7 @@ namespace Tiling_tiles{
 					all_total[j + 1] = tempp;
 				}
 		vector<pair<int, bool>> all_total_mid;
-		for (int t = all_total.size() - 1; t > total_num - 350; t--)
+		for (int t = all_total.size() - 1; t > total_num - 9; t--)
 		{
 			all_total_mid.push_back(all_total[t]);
 			//cout << "order: " << all_total[t].first << "  flip: " << all_total[t].second << " value: " << all_result[t] << " complxeity: " << all_shape_complexity[all_total[t].first] << endl;

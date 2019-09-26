@@ -1,10 +1,11 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/modify.png</file>
+    <file>icons/fileOpen.png</file>
     <file>icons/fileSave.png</file>
     <file>icons/match.png</file>
     <file>icons/compute.png</file>
     <file>icons/fileNew.png</file>
-    <file>icons/fileOpen.png</file>
     <file>icons/morphing.png</file>
   </qresource>
 </RCC>

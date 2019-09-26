@@ -71,8 +71,8 @@ namespace Tiling_tiles{
 	void PolygonTile::setpath()
 	{
 		c_length = 0;
-		imagepath = "D:\\VisualStudioProjects\\DihedralTessellation\\dataset\\";
-		txtpath = "D:\\VisualStudioProjects\\DihedralTessellation\\contours\\";
+		imagepath = "D:\\VisualStudioProjects\\DihedralTesseWindow\\dataset\\";
+		txtpath = "D:\\VisualStudioProjects\\DihedralTesseWindow\\test\\";
 	}
 
 	void PolygonTile::imgtocout(string imagepath, int raw)
@@ -232,7 +232,7 @@ namespace Tiling_tiles{
 		}
 		else
 		{
-			string filepath = "D:\\VisualStudioProjects\\DihedralTessellation\\contours\\" + filename + ".txt";
+			string filepath = "D:\\VisualStudioProjects\\DihedralTesseWindow\\test\\" + filename + ".txt";
 			contour = readTxt(filepath);
 		}
 		if (contour.empty()) return;
