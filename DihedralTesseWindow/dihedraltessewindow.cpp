@@ -233,12 +233,27 @@ DihedralTesseWindow::on_actionModify_triggered()
 		tiling_opt->modifying_c = tiling_opt->poly_tem->contour;
 		int cont_size = tiling_opt->modifying_c.size();
 		EllipseItem.swap(vector<QGraphicsEllipseItem *>());
+		int t = 0;
 		for (int i = 0; i < cont_size; i++)
 		{
-			QRectF rectangle(tiling_opt->modifying_c[i].x - 3, tiling_opt->modifying_c[i].y - 3, 6, 6);
-			QGraphicsEllipseItem *circle = new QGraphicsEllipseItem(rectangle);
-			circle->setPen(QPen(Qt::gray, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-			circle->setBrush(QBrush(Qt::red));
+			QRectF rectangle;
+			QGraphicsEllipseItem *circle;
+			if (t < 4 && i == tiling_opt->mid_inter_morphed[t])
+			{
+				rectangle = QRectF(tiling_opt->modifying_c[i].x - 3, tiling_opt->modifying_c[i].y - 3, 6, 6);
+				circle = new QGraphicsEllipseItem(rectangle);
+				circle->setPen(QPen(Qt::red, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				circle->setBrush(QBrush(Qt::black));
+				t++;
+			}
+			else
+			{
+				rectangle = QRectF(tiling_opt->modifying_c[i].x - 2, tiling_opt->modifying_c[i].y - 2, 4, 4);
+				circle = new QGraphicsEllipseItem(rectangle);
+				circle->setPen(QPen(Qt::gray, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+				circle->setBrush(QBrush(Qt::red));
+			}
+			
 			scene_5.addItem(circle);
 			EllipseItem.push_back(circle);
 		}
@@ -369,10 +384,10 @@ DihedralTesseWindow::mousePressEvent(QMouseEvent *event)
 			if (tiling_opt->chosen)
 			{
 				tiling_opt->modifying_c[tiling_opt->chosen_index] = Point2f(temp_view.x(), temp_view.y());
-				QRectF rectangle(temp_view.x() - 4, temp_view.y() - 4, 8, 8);
+				QRectF rectangle(temp_view.x() - 3, temp_view.y() - 3, 6, 6);
 				QGraphicsEllipseItem *circle = new QGraphicsEllipseItem(rectangle);
 				circle->setPen(QPen(Qt::black, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-				circle->setBrush(QBrush(Qt::cyan));
+				circle->setBrush(QBrush(Qt::green));
 				scene_5.removeItem(EllipseItem[tiling_opt->chosen_index]);
 				//delete(EllipseItem[tiling_opt->chosen_index]);
 				EllipseItem[tiling_opt->chosen_index]->~QGraphicsEllipseItem();
@@ -385,9 +400,9 @@ DihedralTesseWindow::mousePressEvent(QMouseEvent *event)
 				tiling_opt->chosen_index = locate_p(temp_, tiling_opt->modifying_c);
 				//cout << "c  p:  " << tiling_opt->modifying_c[tiling_opt->chosen_index]<<endl;
 				scene_5.removeItem(EllipseItem[tiling_opt->chosen_index]);
-				QRectF rect_ = EllipseItem[tiling_opt->chosen_index]->rect();
+				//QRectF rect_ = EllipseItem[tiling_opt->chosen_index]->rect();
 				//outt << "c  p 2 :  " << rect_ << endl;
-				EllipseItem[tiling_opt->chosen_index]->setRect(QRectF(rect_.topLeft().x() - 1, rect_.topLeft().y() - 1, 8, 8));
+				//EllipseItem[tiling_opt->chosen_index]->setRect(QRectF(rect_.topLeft().x() - 1, rect_.topLeft().y() - 1, 6, 6));
 				EllipseItem[tiling_opt->chosen_index]->setPen(QPen(Qt::black, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 				EllipseItem[tiling_opt->chosen_index]->setBrush(QBrush(Qt::cyan));
 				scene_5.addItem(EllipseItem[tiling_opt->chosen_index]);
@@ -421,6 +436,7 @@ DihedralTesseWindow::keyPressEvent(QKeyEvent *event)
 			reply = QMessageBox::information(this, tr("Information"), message);
 			return;
 		}
+		tiling_clear();
 		if (event->key() == Qt::Key_W)
 		{
 			if (tiling_opt->Tiling_index != 0)
@@ -484,6 +500,7 @@ DihedralTesseWindow::keyPressEvent(QKeyEvent *event)
 			reply = QMessageBox::information(this, tr("Information"), message);
 			return;
 		}
+		candidate_clear();
 		if (event->key() == Qt::Key_A)
 		{
 			if (tiling_opt->Candidate_index != 0)
@@ -584,7 +601,7 @@ DihedralTesseWindow::exportSVG(QGraphicsView* view)
 {
 	QString fileName = QFileDialog::getSaveFileName(this,
 		tr("Export to SVG"),
-		".",
+		"../result/compare/",
 		tr("SVG (*.svg)\n"));
 
 	QSvgGenerator svg;
@@ -601,7 +618,24 @@ DihedralTesseWindow::exportSVG(QGraphicsView* view)
 	painter.end();
 }
 
+void 
+DihedralTesseWindow::tiling_clear()
+{
+	scene2.clear();
+	scene_4.clear();
+	scene_5.clear();
+	scene_6.clear();
+	tiling_opt->Candidate_index = 0;
+	tiling_opt->candidate_contours.swap(vector<vector<Point2f>>());
+}
 
+void 
+DihedralTesseWindow::candidate_clear()
+{
+	scene2.clear();
+	scene_5.clear();
+	scene_6.clear();
+}
 
 //bool
 //DihedralTesseWindow::eventFilter(QObject *o, QEvent *e)

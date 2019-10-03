@@ -87,6 +87,10 @@ protected:
 	void InitialData();
 	void exportSVG(QGraphicsView* view);
 
+public:
+	void tiling_clear();
+	void candidate_clear();
+
 Q_SIGNALS:
 	void changed();
 

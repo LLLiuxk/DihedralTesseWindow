@@ -106,8 +106,8 @@ namespace Tiling_tiles{
 		//mkdir(na);
 
 		int trans = Tanslation_rule(p_p_index, contour_, rootname);
-		int rotas = 0;// Rotation_rule(p_p_index, contour_, rootname);
-		int flips = 0;// Flipping_rule(p_p_index, contour_, rootname);
+		int rotas = Rotation_rule(p_p_index, contour_, rootname);
+		int flips = Flipping_rule(p_p_index, contour_, rootname);
 		int count = trans + rotas + flips;
 		cout << "succeed count: " << count << " trans: " << trans << " rotat: " << rotas << " flips: " << flips << endl;
 		//midtime = clock();
@@ -183,7 +183,6 @@ namespace Tiling_tiles{
 	{
 		int rotas = 0;
 		int ppindex = part_points_index.size();
-		int margin = contour_s.size() / 10;
 		int contsize = contour_s.size();
 		Point2f cent_cont = center_p(contour_s);
 
@@ -243,7 +242,7 @@ namespace Tiling_tiles{
 	{
 		int trans = 0;
 		int ppindex = part_points_index.size();
-		int margin = contour_s.size() / 10;
+		int margin = contour_s.size() / 20;
 		int contsize = contour_s.size();
 		Point2f cent_cont = center_p(contour_s);
 
@@ -310,7 +309,7 @@ namespace Tiling_tiles{
 	{
 		int flips = 0;
 		int ppindex = part_points_index.size();
-		int margin = contour_s.size() / 10;
+		int margin = contour_s.size() / 20;
 		int contsize = contour_s.size();
 		Point2f cent_cont = center_p(contour_s);
 
@@ -471,6 +470,7 @@ namespace Tiling_tiles{
 			allcenter += t;
 		}
 		Point2f shift = Point2f(1200, 400) - 0.1*allcenter;
+		//Mat drawing1 = Mat(2000, 2000, CV_8UC3, Scalar(255, 255, 255));
 		for (int i = 0; i < 4; i++)
 		{
 			vector<Point2f> one_;
@@ -480,7 +480,12 @@ namespace Tiling_tiles{
 				one_.push_back(p);
 			}
 			draw_poly(countname, one_, all_cent[i] * 0.4 + shift);
+			//draw_poly(drawing1, four_place[i], all_cent[i] + Point2f(1000, 1000) - 0.25*allcenter);
 		}
+		/*clock_t start;
+		start = clock();
+		int st = (int)start;
+		imwrite("D://result111"+int2string(st)+".png", drawing1);*/
 		return false;
 	}
 
@@ -1016,7 +1021,7 @@ namespace Tiling_tiles{
 		candidate_contours.swap(vector<vector<Point2f>>());
 		cand_paths.swap(vector<vector<pair<int, int>>>());
 
-		for (int j = 0; j < 8; j++) //只要候选图案里的前8个
+		for (int j = 0; j < 10; j++) //只要候选图案里的前8个
 		{
 			//将所有的结果保存下来
 			poly_second->loadPoints(contour_dataset[candidate_patterns[j].first]);
@@ -1146,7 +1151,7 @@ namespace Tiling_tiles{
 				}
 		//cout << "the fianl order: " << endl;
 		vector<pair<int, bool>> all_total_mid;
-		for (int t = total_num - 1; t > total_num - 9; t--)
+		for (int t = total_num - 1; t > total_num - 11; t--)
 		{
 			all_total_mid.push_back(all_final[t]);
 			cout << "order: " << all_final[t].first << "  flip: " << all_final[t].second << " value: " << all_result[t] << " complxeity: " << all_shape_complexity[all_final[t].first] << endl;
@@ -1218,7 +1223,7 @@ namespace Tiling_tiles{
 					all_total[j + 1] = tempp;
 				}
 		vector<pair<int, bool>> all_total_mid;
-		for (int t = all_total.size() - 1; t > total_num - 9; t--)
+		for (int t = all_total.size() - 1; t > total_num - 11; t--)
 		{
 			all_total_mid.push_back(all_total[t]);
 			//cout << "order: " << all_total[t].first << "  flip: " << all_total[t].second << " value: " << all_result[t] << " complxeity: " << all_shape_complexity[all_total[t].first] << endl;

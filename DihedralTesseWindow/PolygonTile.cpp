@@ -292,14 +292,13 @@ namespace Tiling_tiles{
 	vector<int> PolygonTile::partition_points()
 	{
 		int cur_p_num = 20;   //cur_p_num 个不相邻的最大cos值点
-		int margin = 12;      //margin个点的采样间隔
 		double ratio = 0.012; //筛选间隔与周长之比
 		vector<int> max_order;
 		contour_sampling();
 		max_order = cand_tiling_v(cur_p_num);
 		int contoursize = contour.size();
 		vector<int> all_order = max_order;
-
+		int margin = 12;// contoursize / 50; //margin个点的采样间隔
 		for (int i = 0; i < contoursize; i = i + margin)
 		{
 			int flag = 0;
